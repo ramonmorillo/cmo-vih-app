@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMO-VIH Pro | Atención Farmacéutica VIH</title>
+    <meta name="description" content="Sistema avanzado de atención farmacéutica especializado en VIH usando modelo CMO">
+    <meta name="keywords" content="VIH, farmacia, CMO, atención farmacéutica, adherencia">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .version-info {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 25px;
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            height: fit-content;
+        }
+
+        .analysis-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .tools-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            height: fit-content;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 2px solid #e9ecef;
+        }
+
+        .score-calculator {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .score-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .cmo-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 6px solid;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .cmo-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .capacidad {
+            border-left-color: #e74c3c;
+        }
+
+        .motivacion {
+            border-left-color: #f39c12;
+        }
+
+        .oportunidad {
+            border-left-color: #27ae60;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .capacidad .card-icon {
+            background: #e74c3c;
+        }
+
+        .motivacion .card-icon {
+            background: #f39c12;
+        }
+
+        .oportunidad .card-icon {
+            background: #27ae60;
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .priority-section {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .priority-1 {
+            background: #e74c3c;
+        }
+
+        .priority-2 {
+            background: #f39c12;
+        }
+
+        .priority-3 {
+            background: #27ae60;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+
+        button {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20a035);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+        }
+
+        .btn-full {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+
+        .factor-list {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .factor-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #e74c3c;
+            font-size: 13px;
+        }
+
+        .report-template {
+            background: #f8f9fa;
+            border: 2px dashed #6c757d;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-line;
+            max-height: 300px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        .reminder-item {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .reminder-date {
+            font-weight: bold;
+            color: #e17055;
+        }
+
+        .reminder-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            border-bottom-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .objective-card {
+            background: #fff5f5;
+            border: 2px dashed #e74c3c;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .interventions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .intervention-item {
+            background: #e8f5e8;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+            font-size: 13px;
+        }
+
+        .dimension-header {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+        }
+
+        .github-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9em;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .github-badge:hover {
+            background: #555;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .github-badge {
+                position: relative;
+                top: auto;
+                right: auto;
+                display: block;
+                margin: 10px auto;
+                width: fit-content;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .version-info {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#" class="github-badge" onclick="alert('¡Proximamente en GitHub!')">
+        ⭐ Ver en GitHub
+    </a>
+
+    <div class="container">
+        <div class="header">
+            <div class="version-info">v1.2025</div>
+            <h1>🔬 CMO-VIH Pro</h1>
+            <p>Sistema Avanzado de Atención Farmacéutica en VIH</p>
+        </div>
+
+        <div class="main-layout">
+            <!-- SECCIÓN DE ENTRADA -->
+            <div class="input-section">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('case')">📋 Caso</div>
+                    <div class="tab" onclick="switchTab('score')">🧮 Score</div>
+                </div>
+
+                <div id="caseTab" class="tab-content active">
+                    <label for="caseText">📋 Descripción del Caso Clínico:</label>
+                    <textarea id="caseText" placeholder="Introduce aquí el texto libre del caso clínico de paciente VIH..."></textarea>
+                    <button onclick="analyzeCase()" class="btn-full">🔍 Analizar Caso</button>
+                    <button onclick="loadExample()" class="btn-secondary btn-full">📚 Cargar Ejemplo</button>
+                </div>
+
+                <div id="scoreTab" class="tab-content">
+                    <h4>🧮 Calculadora de Puntuación CMO-VIH</h4>
+                    
+                    <div class="form-group">
+                        <div class="dimension-header">👤 Demográficas</div>
+                        <div class="form-row">
+                            <div>
+                                <label>Embarazo</label>
+                                <select id="embarazo">
+                                    <option value="0">No embarazada</option>
+                                    <option value="auto">Embarazada (Prioridad 1 automática)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Edad</label>
+                                <select id="edad">
+                                    <option value="0">&lt; 50 años</option>
+                                    <option value="1">&gt; 50 años</option>
+                                    <option value="3">&gt; 65 años</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="dimension-header">🏥 Clínicas</div>
+                        <div class="form-row">
+                            <div>
+                                <label>Comorbilidades</label>
+                                <select id="comorbilidades">
+                                    <option value="0">Menos de 2 patologías</option>
+                                    <option value="2">≥ 2 patologías del mismo patrón</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="dimension-header">💊 Farmacoterapéuticas</div>
+                        <div class="form-row">
+                            <div>
+                                <label>Polifarmacia</label>
+                                <select id="polifarmacia">
+                                    <option value="0">&lt; 6 medicamentos</option>
+                                    <option value="3">≥ 6 medicamentos (TAR incluido)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Índice de complejidad</label>
+                                <select id="complejidad">
+                                    <option value="0">≤ 11.25</option>
+                                    <option value="3">&gt; 11.25</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                <label>Adherencia al TAR</label>
+                                <select id="adherenciaTAR">
+                                    <option value="0">Buena adherencia</option>
+                                    <option value="3">Adherencia subóptima</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Adherencia a medicación concomitante</label>
+                                <select id="adherenciaConcomitante">
+                                    <option value="0">Buena adherencia</option>
+                                    <option value="2">Adherencia subóptima</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="dimension-header">🏥 Uso de recursos sanitarios</div>
+                        <div class="form-row">
+                            <div>
+                                <label>Hospitalizaciones</label>
+                                <select id="hospitalizaciones">
+                                    <option value="0">Ninguna en últimos 6 meses</option>
+                                    <option value="2">≥ 1 en últimos 6 meses</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="dimension-header">🧠 Psicosociales</div>
+                        <div class="form-row">
+                            <div>
+                                <label>Calidad de vida</label>
+                                <select id="calidadVida">
+                                    <option value="0">Normal</option>
+                                    <option value="1">Afectada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Depresión</label>
+                                <select id="depresion">
+                                    <option value="0">No</option>
+                                    <option value="2">Sí</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                <label>Movilidad</label>
+                                <select id="movilidad">
+                                    <option value="0">Normal</option>
+                                    <option value="1">Limitada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Abuso de sustancias</label>
+                                <select id="abusoSustancias">
+                                    <option value="0">No</option>
+                                    <option value="2">Sí (drogas/alcohol)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="dimension-header">🧠 Neurocognitivo-sensorial</div>
+                        <div class="form-row">
+                            <div>
+                                <label>Deterioro neurocognitivo</label>
+                                <select id="deterioroNeurocognitivo">
+                                    <option value="0">No</option>
+                                    <option value="2">Leve/Moderado/Grave</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="dimension-header">👴 Fragilidad</div>
+                        <div class="form-row">
+                            <div>
+                                <label>Fragilidad</label>
+                                <select id="fragilidad">
+                                    <option value="0">No frágil</option>
+                                    <option value="2">Frágil</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="dimension-header">💰 Socioeconómicas</div>
+                        <div class="form-row">
+                            <div>
+                                <label>Aspectos socioeconómicos</label>
+                                <select id="socioeconomico">
+                                    <option value="0">Estables</option>
+                                    <option value="2">Desfavorables (sin hogar, aislamiento, etc.)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="dimension-header">📊 Resultados de salud</div>
+                        <div class="form-row">
+                            <div>
+                                <label>Carga viral</label>
+                                <select id="cargaViral">
+                                    <option value="0">Indetectable</option>
+                                    <option value="4">Detectable</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Objetivos farmacológicos comorbilidades</label>
+                                <select id="objetivosFarmacologicos">
+                                    <option value="0">Alcanzados</option>
+                                    <option value="2">No alcanzados</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="calculateExactScore()" class="btn-full">🧮 Calcular Puntuación</button>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DE ANÁLISIS -->
+            <div class="analysis-section">
+                <div class="tool-card score-calculator">
+                    <h3>📊 Puntuación CMO-VIH</h3>
+                    <div class="score-grid">
+                        <div class="score-item">
+                            <span class="score-value" id="totalScore">--</span>
+                            <small>Total</small>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-value" id="clinicalScore">--</span>
+                            <small>Clínica</small>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-value" id="pharmacotherapyScore">--</span>
+                            <small>Farmacoterapia</small>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-value" id="psychosocialScore">--</span>
+                            <small>Psicosocial</small>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-value" id="healthResultsScore">--</span>
+                            <small>Resultados</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="priority-section">
+                    <h2>🏷️ Estratificación CMO</h2>
+                    <div id="priorityResult">
+                        <p>Realiza el análisis para obtener la estratificación</p>
+                    </div>
+                </div>
+
+                <div class="cmo-card capacidad">
+                    <div class="card-header">
+                        <div class="card-icon">C</div>
+                        <div class="card-title">CAPACIDAD</div>
+                    </div>
+                    <div id="capacidadContent">
+                        <p>Análisis de factores clínicos, farmacoterapéuticos y de salud...</p>
+                    </div>
+                </div>
+
+                <div class="cmo-card motivacion">
+                    <div class="card-header">
+                        <div class="card-icon">M</div>
+                        <div class="card-title">MOTIVACIÓN</div>
+                    </div>
+                    <div id="motivacionContent">
+                        <p>Evaluación de adherencia, educación y compromiso...</p>
+                    </div>
+                </div>
+
+                <div class="cmo-card oportunidad">
+                    <div class="card-header">
+                        <div class="card-icon">O</div>
+                        <div class="card-title">OPORTUNIDAD</div>
+                    </div>
+                    <div id="oportunidadContent">
+                        <p>Análisis de recursos tecnológicos y coordinación asistencial...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DE HERRAMIENTAS -->
+            <div class="tools-section">
+                <div class="tool-card">
+                    <h3>📄 Informes Automáticos</h3>
+                    <button onclick="generateReport('complete')" class="btn-success btn-full">📋 Informe Completo</button>
+                    <button onclick="generateReport('summary')" class="btn-warning btn-full">📝 Resumen HC</button>
+                    <button onclick="generateReport('follow')" class="btn-secondary btn-full">📅 Plan Seguimiento</button>
+                    
+                    <div id="reportOutput" class="report-template hidden"></div>
+                    <button id="copyReport" onclick="copyReport()" class="btn-full hidden">📋 Copiar Informe</button>
+                </div>
+
+                <div class="tool-card">
+                    <h3>⏰ Recordatorios</h3>
+                    <div class="form-row">
+                        <div>
+                            <label>Próxima cita</label>
+                            <input type="date" id="nextAppointment">
+                        </div>
+                        <div>
+                            <label>Tipo</label>
+                            <select id="appointmentType">
+                                <option>Presencial</option>
+                                <option>Telemática</option>
+                                <option>Telefónica</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="addReminder()" class="btn-full">➕ Programar</button>
+                    
+                    <div id="remindersList"></div>
+                </div>
+
+                <div class="tool-card">
+                    <h3>⚙️ Configuración</h3>
+                    <label>🏥 Logo del hospital</label>
+                    <input type="file" id="logoUpload" accept="image/*" onchange="uploadLogo()">
+                    
+                    <div class="form-group">
+                        <label>👨‍⚕️ Farmacéutico responsable</label>
+                        <input type="text" id="pharmacistName" placeholder="Nombre del farmacéutico">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🏥 Centro</label>
+                        <input type="text" id="centerName" placeholder="Nombre del centro">
+                    </div>
+                    
+                    <button onclick="saveConfig()" class="btn-full">💾 Guardar Config</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>CMO-VIH Pro v1.2025 | Sistema de Atención Farmacéutica Especializada</p>
+            <p>Desarrollado para optimizar el seguimiento farmacoterapéutico en pacientes VIH</p>
+            <p><strong>Creado por Ramón Morillo - V1.2025</strong></p>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentPriority = 0;
+        let currentScores = {
+            total: 0,
+            demographic: 0,
+            clinical: 0,
+            pharmacotherapy: 0,
+            healthCare: 0,
+            psychosocial: 0,
+            neurocognitive: 0,
+            frailty: 0,
+            socioeconomic: 0,
+            healthResults: 0
+        };
+        let reminders = [];
+        let currentReport = '';
+        let appConfig = {
+            pharmacist: '',
+            center: '',
+            logo: ''
+        };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfig();
+            loadReminders();
+            loadExample();
+            setTimeout(() => analyzeCase(), 100);
+        });
+
+        function switchTab(tabName) {
+            // Quitar active de todos
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Activar el seleccionado
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        function loadExample() {
+            document.getElementById('caseText').value = `Varón de 52 años, diagnosticado de infección por VIH hace 15 años. Actualmente en tratamiento con bictegravir/tenofovir alafenamida/emtricitabina 1 comprimido al día.
+
+Antecedentes: Diagnóstico a los 37 años con carga viral de 150.000 copias/ml y CD4 de 280 cel/μl. Ha tenido varios cambios de tratamiento por efectos adversos. Comorbilidades: diabetes mellitus tipo 2, hipertensión arterial, dislipidemia. Presenta fragilidad según criterios de Fried.
+
+Situación farmacoterapéutica: Toma 8 medicamentos diarios (TAR + metformina + enalapril + atorvastatina + omeprazol + lorazepam + vitamina D + calcio). Refiere olvidos ocasionales del TAR (2-3 veces al mes). Índice de complejidad: 13.2.
+
+Situación social: Vive solo. Nivel educativo básico. Pensionista por invalidez. Antecedente de consumo de alcohol hasta hace 2 años. Presenta síntomas depresivos leves. Utiliza smartphone básico. Vive a 30 minutos del hospital.
+
+Parámetros actuales: Carga viral indetectable (<50 copias/ml). CD4: 450 cel/μl. HbA1c: 8.2%. TA: 145/90 mmHg. Colesterol total: 220 mg/dl. Presenta fatiga y deterioro cognitivo leve. Una hospitalización en los últimos 6 meses por descompensación diabética.`;
+        }
+
+        function calculateExactScore() {
+            const scores = {
+                demographic: 0,
+                clinical: 0,
+                pharmacotherapy: 0,
+                healthCare: 0,
+                psychosocial: 0,
+                neurocognitive: 0,
+                frailty: 0,
+                socioeconomic: 0,
+                healthResults: 0
+            };
+
+            // Embarazo - prioridad automática
+            if (document.getElementById('embarazo').value === 'auto') {
+                updatePriorityDisplay(1, 'auto');
+                currentScores = { ...scores, total: 0 };
+                updateScoreDisplay(currentScores);
+                return;
+            }
+
+            // Variables demográficas
+            scores.demographic += parseInt(document.getElementById('edad').value);
+
+            // Variables clínicas
+            scores.clinical += parseInt(document.getElementById('comorbilidades').value);
+
+            // Variables farmacoterapéuticas
+            scores.pharmacotherapy += parseInt(document.getElementById('polifarmacia').value);
+            scores.pharmacotherapy += parseInt(document.getElementById('complejidad').value);
+            scores.pharmacotherapy += parseInt(document.getElementById('adherenciaTAR').value);
+            scores.pharmacotherapy += parseInt(document.getElementById('adherenciaConcomitante').value);
+
+            // Uso de recursos sanitarios
+            scores.healthCare += parseInt(document.getElementById('hospitalizaciones').value);
+
+            // Variables psicosociales
+            scores.psychosocial += parseInt(document.getElementById('calidadVida').value);
+            scores.psychosocial += parseInt(document.getElementById('depresion').value);
+            scores.psychosocial += parseInt(document.getElementById('abusoSustancias').value);
+
+            // Neurocognitivo-sensorial
+            scores.neurocognitive += parseInt(document.getElementById('deterioroNeurocognitivo').value);
+
+            // Fragilidad
+            scores.frailty += parseInt(document.getElementById('fragilidad').value);
+
+            // Socioeconómicas
+            scores.socioeconomic += parseInt(document.getElementById('socioeconomico').value);
+
+            // Resultados de salud
+            scores.healthResults += parseInt(document.getElementById('cargaViral').value);
+            scores.healthResults += parseInt(document.getElementById('objetivosFarmacologicos').value);
+
+            const total = scores.demographic + scores.clinical + scores.pharmacotherapy + 
+                         scores.healthCare + scores.psychosocial + scores.neurocognitive + 
+                         scores.frailty + scores.socioeconomic + scores.healthResults;
+
+            // Actualizar display
+            currentScores = { ...scores, total };
+            updateScoreDisplay(currentScores);
+
+            // Determinar prioridad según umbrales definidos en el estudio
+            let priority = 3;
+            if (total >= 15) priority = 1;
+            else if (total >= 7) priority = 2;
+
+            currentPriority = priority;
+            updatePriorityDisplay(priority);
+        }
+
+        function updateScoreDisplay(scores) {
+            document.getElementById('totalScore').textContent = scores.total;
+            document.getElementById('clinicalScore').textContent = scores.clinical + scores.demographic + scores.healthCare + scores.neurocognitive + scores.frailty + scores.socioeconomic;
+            document.getElementById('pharmacotherapyScore').textContent = scores.pharmacotherapy;
+            document.getElementById('psychosocialScore').textContent = scores.psychosocial;
+            document.getElementById('healthResultsScore').textContent = scores.healthResults;
+        }
+
+        function analyzeCase() {
+            const caseText = document.getElementById('caseText').value;
+            if (!caseText.trim()) {
+                alert('Por favor, introduce un caso clínico para analizar');
+                return;
+            }
+
+            // Análisis automático del texto
+            const autoScores = analyzeTextForScores(caseText);
+            updateScoreDisplay(autoScores);
+            
+            const priority = calculatePriorityFromText(caseText);
+            currentPriority = priority;
+            updatePriorityDisplay(priority);
+            
+            updateCapacidadAnalysis(caseText);
+            updateMotivacionAnalysis(caseText);
+            updateOportunidadAnalysis(caseText);
+        }
+
+        function analyzeTextForScores(text) {
+            let scores = {
+                total: 0,
+                demographic: 0,
+                clinical: 0,
+                pharmacotherapy: 0,
+                healthCare: 0,
+                psychosocial: 0,
+                neurocognitive: 0,
+                frailty: 0,
+                socioeconomic: 0,
+                healthResults: 0
+            };
+
+            const lowerText = text.toLowerCase();
+
+            // Análisis demográfico
+            if (lowerText.includes('años')) {
+                const ageMatch = text.match(/(\d+)\s*años/);
+                if (ageMatch) {
+                    const age = parseInt(ageMatch[1]);
+                    if (age > 65) scores.demographic += 3;
+                    else if (age > 50) scores.demographic += 1;
+                }
+            }
+
+            // Análisis clínico
+            const comorbidities = ['diabetes', 'hipertensión', 'dislipidemia', 'cardiopatía', 'nefropatía', 'hepatopatía'];
+            let comorbCount = 0;
+            comorbidities.forEach(comord => {
+                if (lowerText.includes(comord)) comorbCount++;
+            });
+            if (comorbCount >= 2) scores.clinical += 2;
+
+            // Análisis farmacoterapéutico
+            if (lowerText.includes('medicamentos') || lowerText.includes('fármacos')) {
+                const medMatch = text.match(/(\d+)\s*medicamentos/);
+                if (medMatch && parseInt(medMatch[1]) >= 6) scores.pharmacotherapy += 3;
+            }
+            if (lowerText.includes('olvid') || lowerText.includes('adherencia subóptima') || lowerText.includes('incumplimiento')) {
+                scores.pharmacotherapy += 3;
+            }
+            if (lowerText.includes('complejidad') || lowerText.includes('complejo')) {
+                const complexMatch = text.match(/(\d+\.?\d*)/);
+                if (complexMatch && parseFloat(complexMatch[1]) > 11.25) scores.pharmacotherapy += 3;
+            }
+
+            // Uso de recursos sanitarios
+            if (lowerText.includes('hospitalización') || lowerText.includes('ingreso')) scores.healthCare += 2;
+
+            // Psicosociales
+            if (lowerText.includes('depresión') || lowerText.includes('depresivo')) scores.psychosocial += 2;
+            if (lowerText.includes('alcohol') || lowerText.includes('drogas')) scores.psychosocial += 2;
+            if (lowerText.includes('fatiga') || lowerText.includes('movilidad limitada')) scores.psychosocial += 1;
+
+            // Neurocognitivo
+            if (lowerText.includes('deterioro cognitivo') || lowerText.includes('cognitivo')) scores.neurocognitive += 2;
+
+            // Fragilidad
+            if (lowerText.includes('frágil') || lowerText.includes('fragilidad')) scores.frailty += 2;
+
+            // Socioeconómico
+            if (lowerText.includes('vive solo') || lowerText.includes('aislamiento') || lowerText.includes('pensionista')) scores.socioeconomic += 2;
+
+            // Resultados de salud
+            if (lowerText.includes('detectable') && !lowerText.includes('indetectable')) scores.healthResults += 4;
+            if (lowerText.includes('objetivos no alcanzados') || lowerText.includes('mal control')) scores.healthResults += 2;
+
+            scores.total = scores.demographic + scores.clinical + scores.pharmacotherapy + 
+                          scores.healthCare + scores.psychosocial + scores.neurocognitive + 
+                          scores.frailty + scores.socioeconomic + scores.healthResults;
+            
+            currentScores = scores;
+            return scores;
+        }
+
+        function calculatePriorityFromText(text) {
+            const score = currentScores.total;
+            if (text.toLowerCase().includes('embaraz')) return 1;
+            if (score >= 15) return 1;
+            if (score >= 7) return 2;
+            return 3;
+        }
+
+        function updatePriorityDisplay(priority, type = 'score') {
+            const priorityResult = document.getElementById('priorityResult');
+            let priorityText = '';
+            let badgeClass = '';
+            
+            if (type === 'auto') {
+                priorityText = 'PRIORIDAD 1 - AUTOMÁTICA';
+                badgeClass = 'priority-1';
+                priorityResult.innerHTML = `
+                    <h3>Embarazo detectado</h3>
+                    <div class="priority-badge ${badgeClass}">${priorityText}</div>
+                    <p style="margin-top: 15px;">Atención farmacéutica prioritaria por embarazo</p>
+                `;
+            } else {
+                switch(priority) {
+                    case 1:
+                        priorityText = 'PRIORIDAD 1 - ALTA';
+                        badgeClass = 'priority-1';
+                        break;
+                    case 2:
+                        priorityText = 'PRIORIDAD 2 - MEDIA';
+                        badgeClass = 'priority-2';
+                        break;
+                    case 3:
+                        priorityText = 'PRIORIDAD 3 - BAJA';
+                        badgeClass = 'priority-3';
+                        break;
+                }
+                
+                const frequency = getFollowUpFrequency(priority);
+                priorityResult.innerHTML = `
+                    <h3>Puntuación Total: ${currentScores.total}</h3>
+                    <div class="priority-badge ${badgeClass}">${priorityText}</div>
+                    <p style="margin-top: 15px;">Seguimiento: ${frequency}</p>
+                `;
+            }
+        }
+
+        function getFollowUpFrequency(priority) {
+            switch(priority) {
+                case 1: return 'Cada 3 meses';
+                case 2: return 'Cada 6 meses';
+                case 3: return 'Cada 12 meses';
+                default: return 'Sin determinar';
+            }
+        }
+
+        function updateCapacidadAnalysis(text) {
+            const content = document.getElementById('capacidadContent');
+            const lowerText = text.toLowerCase();
+            
+            let factors = [];
+            
+            if (lowerText.includes('carga viral detectable') || (lowerText.includes('detectable') && !lowerText.includes('indetectable'))) {
+                factors.push('Carga viral detectable - Necesidad de optimización TAR');
+            }
+            if (lowerText.includes('olvid') || lowerText.includes('adherencia')) {
+                factors.push('Problemas de adherencia identificados');
+            }
+            if (lowerText.includes('comorbilidad') || lowerText.includes('diabetes') || lowerText.includes('hipertensión')) {
+                factors.push('Múltiples comorbilidades presentes');
+            }
+            if (lowerText.includes('hospitalización') || lowerText.includes('ingreso')) {
+                factors.push('Uso reciente de recursos sanitarios');
+            }
+            if (lowerText.includes('polifarmacia') || lowerText.includes('medicamentos')) {
+                factors.push('Régimen farmacoterapéutico complejo');
+            }
+            if (lowerText.includes('frágil') || lowerText.includes('fragilidad')) {
+                factors.push('Fragilidad detectada');
+            }
+            
+            const interventions = [
+                'Revisión y validación del tratamiento TAR',
+                'Seguimiento integral de adherencia TAR y medicación concomitante',
+                'Monitorización de interacciones medicamentosas',
+                'Conciliación farmacoterapéutica en ingresos/altas',
+                'Seguimiento de seguridad del tratamiento',
+                'Revisión periódica de parámetros de fragilidad'
+            ];
+            
+            content.innerHTML = `
+                <div class="factor-list">
+                    ${factors.map(factor => `<div class="factor-item">• ${factor}</div>`).join('')}
+                </div>
+                <div class="objective-card">
+                    <strong>Objetivo:</strong> Optimizar resultados farmacoterapéuticos y control de comorbilidades
+                </div>
+                <div class="interventions-grid">
+                    ${interventions.map(int => `<div class="intervention-item">${int}</div>`).join('')}
+                </div>
+            `;
+        }
+
+        function updateMotivacionAnalysis(text) {
+            const content = document.getElementById('motivacionContent');
+            const lowerText = text.toLowerCase();
+            
+            let factors = [];
+            
+            if (lowerText.includes('depresión') || lowerText.includes('depresivo')) {
+                factors.push('Síntomas depresivos presentes');
+            }
+            if (lowerText.includes('alcohol') || lowerText.includes('drogas')) {
+                factors.push('Antecedente de abuso de sustancias');
+            }
+            if (lowerText.includes('olvid') || lowerText.includes('adherencia')) {
+                factors.push('Problemas de adherencia reportados');
+            }
+            if (lowerText.includes('educativo básico') || lowerText.includes('nivel básico')) {
+                factors.push('Nivel educativo básico');
+            }
+            if (lowerText.includes('vive solo') || lowerText.includes('aislamiento')) {
+                factors.push('Situación de aislamiento social');
+            }
+            if (lowerText.includes('pensionista') || lowerText.includes('invalidez')) {
+                factors.push('Situación laboral/económica desfavorable');
+            }
+            
+            const interventions = [
+                'Educación sobre VIH, TAR y rutas de transmisión',
+                'Información sobre importancia de adherencia',
+                'Promoción de estilos de vida saludables',
+                'Estrategias de mejora de adherencia personalizadas',
+                'Evaluación de habilidades digitales',
+                'Coordinación con servicios de psicología/psiquiatría',
+                'Coordinación con servicios sociales'
+            ];
+            
+            content.innerHTML = `
+                <div class="factor-list">
+                    ${factors.map(factor => `<div class="factor-item">• ${factor}</div>`).join('')}
+                </div>
+                <div class="objective-card">
+                    <strong>Objetivo:</strong> Mejorar motivación y compromiso con el tratamiento
+                </div>
+                <div class="interventions-grid">
+                    ${interventions.map(int => `<div class="intervention-item">${int}</div>`).join('')}
+                </div>
+            `;
+        }
+
+        function updateOportunidadAnalysis(text) {
+            const content = document.getElementById('oportunidadContent');
+            const lowerText = text.toLowerCase();
+            
+            let factors = [];
+            
+            if (lowerText.includes('smartphone') || lowerText.includes('móvil')) {
+                factors.push('Acceso a tecnología móvil');
+            }
+            if (lowerText.includes('minutos') && lowerText.includes('hospital')) {
+                factors.push('Distancia conocida al centro sanitario');
+            }
+            if (lowerText.includes('transporte') || lowerText.includes('acceso')) {
+                factors.push('Consideraciones de accesibilidad');
+            }
+            if (lowerText.includes('familia') || lowerText.includes('cuidador')) {
+                factors.push('Red de apoyo familiar disponible');
+            }
+            if (lowerText.includes('asociación') || lowerText.includes('grupo')) {
+                factors.push('Posible vinculación con asociaciones');
+            }
+            
+            const interventions = [
+                'Consultas telemáticas cuando sea apropiado',
+                'Herramientas de comunicación rápida con paciente/familia',
+                'Coordinación con diferentes niveles asistenciales',
+                'Coordinación con asociaciones de pacientes',
+                'Planificación de visitas en coordinación con especialistas',
+                'Recomendaciones sobre apps y web para comprensión de patología',
+                'Establecimiento de circuitos de manejo farmacoterapéutico'
+            ];
+            
+            content.innerHTML = `
+                <div class="factor-list">
+                    ${factors.map(factor => `<div class="factor-item">• ${factor}</div>`).join('')}
+                </div>
+                <div class="objective-card">
+                    <strong>Objetivo:</strong> Optimizar coordinación asistencial y recursos tecnológicos
+                </div>
+                <div class="interventions-grid">
+                    ${interventions.map(int => `<div class="intervention-item">${int}</div>`).join('')}
+                </div>
+            `;
+        }
+
+        function generateReport(type) {
+            const today = new Date().toLocaleDateString('es-ES');
+            const caseText = document.getElementById('caseText').value;
+            
+            let report = '';
+            
+            switch(type) {
+                case 'complete':
+                    report = `INFORME FARMACOTERAPÉUTICO CMO-VIH
+Fecha: ${today}
+Farmacéutico: ${appConfig.pharmacist || '[Nombre farmacéutico]'}
+Centro: ${appConfig.center || '[Nombre centro]'}
+
+PUNTUACIÓN CMO-VIH:
+- Puntuación total: ${currentScores.total}
+- Variables demográficas: ${currentScores.demographic}
+- Variables clínicas: ${currentScores.clinical}
+- Variables farmacoterapéuticas: ${currentScores.pharmacotherapy}
+- Uso recursos sanitarios: ${currentScores.healthCare}
+- Variables psicosociales: ${currentScores.psychosocial}
+- Variables neurocognitivas: ${currentScores.neurocognitive}
+- Variables de fragilidad: ${currentScores.frailty}
+- Variables socioeconómicas: ${currentScores.socioeconomic}
+- Resultados de salud: ${currentScores.healthResults}
+
+ESTRATIFICACIÓN: ${getPriorityText(currentPriority)}
+FRECUENCIA DE SEGUIMIENTO: ${getFollowUpFrequency(currentPriority)}
+
+ANÁLISIS CMO:
+
+CAPACIDAD:
+- Factores farmacoterapéuticos y clínicos identificados
+- Estado de la infección por VIH y comorbilidades
+- Complejidad del régimen terapéutico
+- Necesidad de optimización de adherencia
+
+MOTIVACIÓN:
+- Nivel de comprensión sobre VIH y tratamiento
+- Factores psicosociales que influyen en adherencia
+- Barreras para el cumplimiento terapéutico
+- Aspectos socioeconómicos relevantes
+
+OPORTUNIDAD:
+- Recursos tecnológicos y digitales disponibles
+- Accesibilidad a servicios sanitarios
+- Coordinación con equipo multidisciplinar
+- Vinculación con asociaciones de pacientes
+
+RECOMENDACIONES:
+1. Seguimiento farmacoterapéutico según prioridad establecida
+2. Educación personalizada sobre VIH y tratamiento TAR
+3. Optimización de adherencia mediante estrategias individualizadas
+4. Monitorización de carga viral y parámetros de comorbilidades
+5. Coordinación con equipo multidisciplinar (infectología, psicología, trabajo social)
+6. Evaluación periódica de efectividad y seguridad
+
+PRÓXIMAS ACTUACIONES:
+- Revisión en consulta según priorización CMO-VIH
+- Monitorización de parámetros virológicos e inmunológicos
+- Evaluación de objetivos farmacoterapéuticos`;
+                    break;
+                    
+                case 'summary':
+                    report = `RESUMEN HISTORIA CLÍNICA - CMO-VIH
+Fecha: ${today}
+
+DATOS DEMOGRÁFICOS Y CLÍNICOS:
+${caseText.substring(0, 200)}...
+
+PUNTUACIÓN CMO-VIH: ${currentScores.total}
+PRIORIDAD: ${getPriorityText(currentPriority)}
+SEGUIMIENTO: ${getFollowUpFrequency(currentPriority)}
+
+PLAN TERAPÉUTICO:
+- Continuidad del tratamiento TAR actual
+- Seguimiento según estratificación CMO-VIH
+- Educación sanitaria personalizada sobre VIH
+- Monitorización de adherencia y comorbilidades`;
+                    break;
+                    
+                case 'follow':
+                    report = `PLAN DE SEGUIMIENTO CMO-VIH
+Fecha: ${today}
+Paciente: [Nombre paciente]
+Prioridad: ${getPriorityText(currentPriority)}
+
+CRONOGRAMA DE SEGUIMIENTO:
+${getFollowUpSchedule(currentPriority)}
+
+OBJETIVOS DE SEGUIMIENTO:
+1. Mantenimiento de carga viral indetectable
+2. Adherencia terapéutica óptima al TAR
+3. Control adecuado de comorbilidades
+4. Calidad de vida mantenida
+5. Prevención de resistencias virales
+
+INDICADORES DE SEGUIMIENTO:
+- Carga viral VIH (objetivo: <50 copias/ml)
+- Recuento CD4 (objetivo: >500 cel/μl)
+- Adherencia al TAR (objetivo: >95%)
+- Control de comorbilidades (HbA1c, TA, perfil lipídico)
+- Calidad de vida (escalas validadas)
+- Eventos adversos y toxicidades
+
+CONTACTOS PROGRAMADOS:
+- Próxima consulta: [Fecha]
+- Tipo de consulta: [Presencial/Telemática]
+- Frecuencia según priorización CMO-VIH
+
+INTERVENCIONES ESPECÍFICAS:
+Según prioridad ${currentPriority}:
+${getInterventionsByPriority(currentPriority)}`;
+                    break;
+            }
+            
+            currentReport = report;
+            document.getElementById('reportOutput').textContent = report;
+            document.getElementById('reportOutput').classList.remove('hidden');
+            document.getElementById('copyReport').classList.remove('hidden');
+        }
+
+        function getPriorityText(priority) {
+            switch(priority) {
+                case 1: return 'PRIORIDAD 1 - ALTA';
+                case 2: return 'PRIORIDAD 2 - MEDIA';
+                case 3: return 'PRIORIDAD 3 - BAJA';
+                default: return 'Sin determinar';
+            }
+        }
+
+        function getFollowUpSchedule(priority) {
+            switch(priority) {
+                case 1: 
+                    return `- Consulta inicial: Inmediata
+- Primera revisión: 1 mes
+- Revisiones posteriores: Cada 3 meses
+- Contacto telefónico: Quincenal primer mes
+- Monitorización intensiva de carga viral y adherencia`;
+                case 2:
+                    return `- Consulta inicial: En 2 semanas
+- Primera revisión: 2 meses
+- Revisiones posteriores: Cada 6 meses
+- Contacto telefónico: Mensual si necesario
+- Monitorización estándar de parámetros`;
+                case 3:
+                    return `- Consulta inicial: En 1 mes
+- Primera revisión: 6 meses
+- Revisiones posteriores: Cada 12 meses
+- Contacto telefónico: Según necesidad
+- Monitorización de rutina`;
+                default:
+                    return '- Programar según evaluación inicial';
+            }
+        }
+
+        function getInterventionsByPriority(priority) {
+            const interventions = {
+                1: [
+                    "Revisión y validación del tratamiento TAR",
+                    "Seguimiento integral de adherencia",
+                    "Revisión de medicación concomitante",
+                    "Seguimiento de seguridad del tratamiento",
+                    "Información sobre tratamiento y prevención",
+                    "Educación sobre importancia de adherencia",
+                    "Investigación de habilidades digitales",
+                    "Recomendaciones sobre apps y web",
+                    "Planificación de visitas con especialistas"
+                ],
+                2: [
+                    "Revisión y validación del tratamiento TAR",
+                    "Seguimiento integral de adherencia",
+                    "Revisión de medicación concomitante",
+                    "Conciliación en ingresos/altas hospitalarias",
+                    "Educación sobre VIH y tratamiento",
+                    "Información sobre adherencia",
+                    "Promoción de estilos de vida saludables",
+                    "Unificación de criterios entre profesionales"
+                ],
+                3: [
+                    "Revisión y validación del tratamiento TAR",
+                    "Seguimiento integral de adherencia",
+                    "Revisión de medicación concomitante"
+                ]
+            };
+            
+            return interventions[priority]?.map(int => `- ${int}`).join('\n') || '- Intervenciones según evaluación';
+        }
+
+        function copyReport() {
+            navigator.clipboard.writeText(currentReport).then(() => {
+                const btn = document.getElementById('copyReport');
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copiado';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }).catch(() => {
+                alert('No se pudo copiar al portapapeles');
+            });
+        }
+
+        function addReminder() {
+            const date = document.getElementById('nextAppointment').value;
+            const type = document.getElementById('appointmentType').value;
+            
+            if (!date) {
+                alert('Por favor, selecciona una fecha');
+                return;
+            }
+            
+            const reminder = {
+                id: Date.now(),
+                date: date,
+                type: type,
+                created: new Date().toISOString()
+            };
+            
+            reminders.push(reminder);
+            saveReminders();
+            loadReminders();
+            
+            // Limpiar campos
+            document.getElementById('nextAppointment').value = '';
+        }
+
+        function loadReminders() {
+            const container = document.getElementById('remindersList');
+            
+            if (reminders.length === 0) {
+                container.innerHTML = '<p style="color: #666; font-style: italic;">No hay recordatorios programados</p>';
+                return;
+            }
+            
+            container.innerHTML = reminders.map(reminder => `
+                <div class="reminder-item">
+                    <div class="reminder-date">${new Date(reminder.date).toLocaleDateString('es-ES')}</div>
+                    <div>Consulta ${reminder.type}</div>
+                    <div class="reminder-actions">
+                        <button class="btn-small btn-secondary" onclick="editReminder(${reminder.id})">✏️ Editar</button>
+                        <button class="btn-small" onclick="deleteReminder(${reminder.id})" style="background: #e74c3c;">🗑️ Eliminar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteReminder(id) {
+            if (confirm('¿Eliminar este recordatorio?')) {
+                reminders = reminders.filter(r => r.id !== id);
+                saveReminders();
+                loadReminders();
+            }
+        }
+
+        function editReminder(id) {
+            const reminder = reminders.find(r => r.id === id);
+            if (reminder) {
+                document.getElementById('nextAppointment').value = reminder.date;
+                document.getElementById('appointmentType').value = reminder.type;
+                deleteReminder(id);
+            }
+        }
+
+        function saveReminders() {
+            try {
+                localStorage.setItem('cmoVihReminders', JSON.stringify(reminders));
+            } catch (e) {
+                console.log('Recordatorios guardados en memoria');
+            }
+        }
+
+        function uploadLogo() {
+            const file = document.getElementById('logoUpload').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    appConfig.logo = e.target.result;
+                    saveConfig();
+                    alert('Logo cargado correctamente');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveConfig() {
+            appConfig.pharmacist = document.getElementById('pharmacistName').value;
+            appConfig.center = document.getElementById('centerName').value;
+            
+            try {
+                localStorage.setItem('cmoVihConfig', JSON.stringify(appConfig));
+            } catch (e) {
+                console.log('Configuración guardada en memoria');
+            }
+            alert('Configuración guardada correctamente');
+        }
+
+        function loadConfig() {
+            try {
+                const saved = localStorage.getItem('cmoVihConfig');
+                if (saved) {
+                    appConfig = JSON.parse(saved);
+                    document.getElementById('pharmacistName').value = appConfig.pharmacist || '';
+                    document.getElementById('centerName').value = appConfig.center || '';
+                }
+                
+                const savedReminders = localStorage.getItem('cmoVihReminders');
+                if (savedReminders) {
+                    reminders = JSON.parse(savedReminders);
+                }
+            } catch (e) {
+                console.log('Configuración cargada desde memoria');
+            }
+        }
+    </script>
+</body>
+</html>
