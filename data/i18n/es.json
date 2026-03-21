@@ -1,0 +1,252 @@
+{
+  "header": {
+    "eyebrow": "Sistema semiclínico de soporte a la decisión",
+    "subtitle": "Herramienta de soporte para atención farmacéutica del VIH, centrada en la privacidad, con estratificación explicable e ingesta asistida por IA.",
+    "language": "Idioma"
+  },
+  "common": {
+    "none": "Ninguno",
+    "selectPlaceholder": "Seleccione una opción",
+    "noEvidence": "Sin evidencia capturada",
+    "clinicianEntered": "Valor introducido por el clínico",
+    "clinicianConfirmed": "Confirmado por el clínico"
+  },
+  "buttons": {
+    "analyzeText": "Analizar texto clínico",
+    "loadExample": "Cargar ejemplo",
+    "import": "Importar datos",
+    "recalculate": "Recalcular estratificación",
+    "exportSummary": "Resumen clínico",
+    "exportJson": "JSON de investigación",
+    "exportCsv": "CSV de investigación",
+    "print": "Informe imprimible"
+  },
+  "progress": {
+    "title": "Progreso del flujo",
+    "subtitle": "Siga el porcentaje de variables completadas para la estratificación CMO-VIH."
+  },
+  "dashboard": {
+    "eyebrow": "Panel clínico",
+    "title": "Resumen del flujo piloto",
+    "empty": "Complete variables manuales, pegue texto clínico o importe un registro para generar el resumen.",
+    "cmoLevel": "Nivel CMO",
+    "totalScore": "Puntuación total",
+    "keyDrivers": "Factores clave",
+    "riskFlags": "Alertas de riesgo",
+    "followUpIntensity": "Intensidad de seguimiento",
+    "autoClass": "Clasificación automática",
+    "summaryPanel": "Panel de resumen",
+    "suggestedInterventions": "Intervenciones sugeridas"
+  },
+  "inputs": {
+    "manualSection": "Entrada estructurada manual",
+    "textSection": "Pegar texto clínico",
+    "textPlaceholder": "Pegue aquí texto clínico desidentificado. El módulo de IA extrae variables estructuradas, marca datos extraídos frente a inferidos y deja como ausentes los elementos desconocidos.",
+    "importSection": "Importación JSON / CSV",
+    "importPlaceholder": "Pegue un objeto JSON o una línea CSV con identificadores de campo coincidentes.",
+    "futureIntegration": "Preparado para futuros conectores con la HCE mediante el esquema de caso compartido. No se implementa integración real en esta versión estática.",
+    "importEmpty": "Pegue contenido JSON o CSV antes de importar.",
+    "importError": "Error de importación"
+  },
+  "sections": {
+    "demographic": "Demográfica",
+    "clinical": "Clínica",
+    "pharmacotherapy": "Farmacoterapia",
+    "healthCare": "Uso de recursos sanitarios",
+    "psychosocial": "Psicosocial",
+    "neurocognitive": "Neurocognitivo-sensorial",
+    "frailty": "Fragilidad",
+    "socioeconomic": "Socioeconómica",
+    "healthResults": "Resultados de salud"
+  },
+  "fields": {
+    "pregnancy": "Embarazo",
+    "ageBand": "Rango de edad",
+    "comorbidities": "Carga de comorbilidad",
+    "polypharmacy": "Polifarmacia",
+    "complexity": "Índice de complejidad farmacoterapéutica",
+    "adherenceArt": "Adherencia al TAR",
+    "adherenceConcomitant": "Adherencia a medicación concomitante",
+    "hospitalization": "Hospitalización en los últimos 6 meses",
+    "qualityOfLife": "Calidad de vida",
+    "depression": "Depresión",
+    "substanceUse": "Uso de sustancias",
+    "neurocognitive": "Deterioro neurocognitivo",
+    "frailty": "Fragilidad",
+    "socioeconomic": "Vulnerabilidad socioeconómica",
+    "viralLoad": "Carga viral VIH",
+    "comorbidityGoals": "Objetivos farmacológicos de comorbilidades"
+  },
+  "missing": {
+    "pregnancy": "Estado de embarazo no documentado",
+    "ageBand": "Falta el rango de edad",
+    "comorbidities": "Falta la carga de comorbilidad",
+    "polypharmacy": "Falta el número de medicamentos",
+    "complexity": "Falta el índice de complejidad",
+    "adherenceArt": "Falta la adherencia al TAR",
+    "adherenceConcomitant": "Falta la adherencia concomitante",
+    "hospitalization": "Falta el estado de hospitalización reciente",
+    "qualityOfLife": "Falta la calidad de vida",
+    "depression": "Falta el estado depresivo",
+    "substanceUse": "Falta el estado de uso de sustancias",
+    "neurocognitive": "Falta el estado neurocognitivo",
+    "frailty": "Falta el estado de fragilidad",
+    "socioeconomic": "Falta el estado socioeconómico",
+    "viralLoad": "Falta el estado de carga viral",
+    "comorbidityGoals": "Falta el estado de objetivos de comorbilidad"
+  },
+  "options": {
+    "no": "No",
+    "yes": "Sí",
+    "pregnancyYes": "Embarazo (prioridad 1 automática)",
+    "ageUnder50": "Menor de 50 años",
+    "ageOver50": "Mayor de 50 años",
+    "ageOver65": "Mayor de 65 años",
+    "under50": "Menor de 50 años",
+    "over50": "Mayor de 50 años",
+    "over65": "Mayor de 65 años",
+    "comorbLow": "Menos de 2 comorbilidades relevantes",
+    "comorbHigh": "2 o más comorbilidades relevantes",
+    "low": "Bajo",
+    "high": "Alto",
+    "polyLow": "Menos de 6 medicamentos",
+    "polyHigh": "6 o más medicamentos",
+    "complexityLow": "11.25 o inferior",
+    "complexityHigh": "Mayor de 11.25",
+    "adherenceGood": "Buena adherencia",
+    "adherenceSuboptimal": "Adherencia subóptima",
+    "good": "Buena adherencia",
+    "suboptimal": "Adherencia subóptima",
+    "hospitalNone": "Sin hospitalización en los últimos 6 meses",
+    "hospitalRecent": "1 o más hospitalizaciones en los últimos 6 meses",
+    "none": "Ninguna",
+    "recent": "Hospitalización reciente",
+    "qualityNormal": "Conservada",
+    "qualityAffected": "Afectada",
+    "normal": "Conservada",
+    "affected": "Afectada",
+    "substanceYes": "Sí, alcohol u otras sustancias",
+    "stable": "Estable",
+    "vulnerable": "Vulnerable",
+    "socioStable": "Entorno socioeconómico estable",
+    "socioVulnerable": "Entorno socioeconómico desfavorable",
+    "viralUndetectable": "Indetectable",
+    "viralDetectable": "Detectable",
+    "undetectable": "Indetectable",
+    "detectable": "Detectable",
+    "goalsAchieved": "Objetivos alcanzados",
+    "goalsNotAchieved": "Objetivos no alcanzados",
+    "achieved": "Objetivos alcanzados",
+    "notAchieved": "Objetivos no alcanzados"
+  },
+  "statuses": {
+    "confirmed": "Confirmado",
+    "extracted": "Extraído",
+    "inferred": "Inferido",
+    "missing": "Ausente"
+  },
+  "priority": {
+    "priority1": "Prioridad 1 — Alta",
+    "priority2": "Prioridad 2 — Media",
+    "priority3": "Prioridad 3 — Baja",
+    "priority1Auto": "Prioridad 1 — Automática"
+  },
+  "followup": {
+    "priority1": "Cada 3 meses / seguimiento de alta intensidad",
+    "priority2": "Cada 6 meses / seguimiento de intensidad moderada",
+    "priority3": "Cada 12 meses / seguimiento rutinario"
+  },
+  "interventions": {
+    "priority1": [
+      "Validar de forma inmediata el TAR y el tratamiento de comorbilidades.",
+      "Realizar revisión de adherencia con refuerzo intensivo.",
+      "Coordinar revisión multidisciplinar ante alertas de alto riesgo.",
+      "Valorar barreras digitales, psicosociales y de fragilidad en el mismo flujo."
+    ],
+    "priority2": [
+      "Revisar efectividad y tolerabilidad del tratamiento.",
+      "Abordar barreras de adherencia y necesidades educativas.",
+      "Optimizar el control de comorbilidades con seguimiento coordinado.",
+      "Monitorizar cambios psicosociales y barreras de acceso."
+    ],
+    "priority3": [
+      "Mantener el seguimiento farmacéutico rutinario del VIH.",
+      "Reforzar autocuidado y hábitos de adherencia.",
+      "Reevaluar la estratificación si aparecen nuevos riesgos."
+    ]
+  },
+  "riskFlags": {
+    "pregnancy": "Priorización relacionada con embarazo",
+    "viralLoad": "Carga viral detectable",
+    "artAdherence": "Adherencia subóptima al TAR",
+    "hospitalization": "Hospitalización reciente",
+    "frailty": "Fragilidad presente",
+    "neurocognitive": "Deterioro neurocognitivo"
+  },
+  "traceability": {
+    "title": "Trazabilidad",
+    "timestamp": "Marca temporal",
+    "version": "Versión",
+    "inputSource": "Fuente de entrada",
+    "modifications": "Modificaciones del clínico",
+    "source": "Origen",
+    "evidence": "Evidencia",
+    "autosave": "Autoguardado"
+  },
+  "explainability": {
+    "title": "Panel de explicabilidad",
+    "empty": "Ejecute el motor para mostrar contribuciones y justificación.",
+    "whyTitle": "¿Por qué este nivel?",
+    "contribTitle": "Contribución por variable",
+    "missingTitle": "Datos ausentes",
+    "totalScore": "Puntuación total determinista: {total}.",
+    "autoLevel": "Clasificación automática basada en reglas explícitas: {level}.",
+    "overrideApplied": "Se aplicó una modificación del clínico. Nivel final fijado en {level}.",
+    "noOverride": "No hay modificación clínica activa."
+  },
+  "ai": {
+    "title": "Ingesta asistida por IA",
+    "instructions": "El módulo de IA extrae variables estructuradas del texto pegado, etiqueta cada hallazgo como extraído o inferido y nunca completa valores no documentados.",
+    "empty": "Todavía no hay variables derivadas por IA.",
+    "summaryDetected": "El módulo de procesamiento de texto completó {count} variables estructuradas y dejó como ausentes las no resueltas.",
+    "summaryNone": "No se pudieron extraer variables estructuradas con suficiente confianza del texto pegado.",
+    "analysisComplete": "Extracción asistida por IA completada. Sigue siendo obligatoria la validación humana."
+  },
+  "override": {
+    "title": "Modificación del clínico",
+    "useOverride": "Activar modificación del clínico",
+    "selectLevel": "Seleccionar nivel final",
+    "reason": "Justificación clínica de la modificación",
+    "reasonPlaceholder": "Documente por qué se ajustó el resultado determinista.",
+    "auto": "Mantener clasificación automática"
+  },
+  "exports": {
+    "title": "Salidas y exportaciones",
+    "ready": "Las exportaciones están listas. Use los botones superiores para descargar los entregables estructurados.",
+    "pending": "Ejecute el motor para habilitar las salidas.",
+    "summaryTitle": "Resumen clínico",
+    "totalScore": "Puntuación total",
+    "followUp": "Seguimiento",
+    "keyDrivers": "Factores clave",
+    "riskFlags": "Alertas de riesgo",
+    "source": "Fuente de entrada",
+    "timestamp": "Marca temporal"
+  },
+  "settings": {
+    "title": "Configuración del flujo",
+    "clinicianName": "Nombre del clínico",
+    "clinicianNamePlaceholder": "Clínico responsable",
+    "centerName": "Centro / servicio",
+    "centerNamePlaceholder": "Hospital o servicio de farmacia"
+  },
+  "legal": {
+    "clinicalDisclaimer": "Soporte a la decisión clínica únicamente; no sustituye el juicio profesional.",
+    "aiDisclaimer": "La extracción asistida por IA puede contener errores y requiere validación humana.",
+    "privacyDisclaimer": "Diseño centrado en la privacidad; no requiere identificadores personales.",
+    "regulatoryDisclaimer": "No es un producto sanitario certificado; destinado a investigación, soporte y uso piloto.",
+    "ipDisclaimer": "CMO-VIH Pro v2 — March 2026. Todos los derechos reservados. Prohibida su reproducción sin permiso."
+  },
+  "footer": {
+    "description": "Diseñado para soporte piloto del flujo de atención farmacéutica en VIH, estratificación explicable y expansión escalable con IA."
+  }
+}
