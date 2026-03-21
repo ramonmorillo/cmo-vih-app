@@ -34,7 +34,13 @@ button {
   font-weight: 600;
 }
 button:hover { opacity: 0.95; }
+.button-primary { background: linear-gradient(135deg, var(--primary), var(--primary-strong)); }
 .button-secondary { background: #1d4ed8; }
+.button-ghost { background: white; color: var(--text); border: 1px solid var(--line); }
+.button-with-icon { display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; }
+.button-icon { font-size: 1.05rem; line-height: 1; }
+.icon-button { background: transparent; color: var(--muted); padding: 0.4rem 0.7rem; font-size: 1.4rem; border-radius: 10px; }
+.icon-button:hover { background: rgba(15, 23, 42, 0.06); opacity: 1; }
 textarea, select, input {
   width: 100%;
   border: 1px solid var(--line);
@@ -65,10 +71,10 @@ textarea { min-height: 180px; resize: vertical; }
   color: white;
 }
 .hero__subtitle { max-width: 720px; color: rgba(255,255,255,0.88); }
-.hero__actions { display: grid; gap: 12px; align-content: start; min-width: 220px; }
+.hero__actions { display: grid; gap: 12px; align-content: start; min-width: 280px; }
 .eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.8rem; opacity: 0.8; margin-bottom: 0.5rem; }
 .locale-switcher span { display: block; margin-bottom: 6px; }
-.version-pill, .autosave-pill {
+.version-pill, .autosave-pill, .case-pill {
   background: rgba(255,255,255,0.16);
   color: inherit;
   border-radius: 999px;
@@ -91,6 +97,7 @@ textarea { min-height: 180px; resize: vertical; }
   overflow: hidden;
 }
 .progress-bar span { display: block; height: 100%; background: linear-gradient(135deg, #8b1e3f, #1d4ed8); }
+.dashboard-section__meta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
 .section-heading {
   display: flex;
   justify-content: space-between;
@@ -161,6 +168,58 @@ details.section-card summary::-webkit-details-marker { display: none; }
 .ai-grid { grid-template-columns: 1fr; }
 .ai-item { display: grid; gap: 6px; }
 .empty-panel { padding: 16px; text-align: center; }
+
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.48);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 50;
+}
+
+.modal-card {
+  width: min(640px, 100%);
+  background: var(--surface);
+  border-radius: 24px;
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.24);
+  border: 1px solid rgba(139, 30, 63, 0.14);
+  padding: 24px;
+  display: grid;
+  gap: 18px;
+}
+
+.modal-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.modal-card__header h2 {
+  margin: 0;
+}
+
+.modal-card__body {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.modal-card__actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.eyebrow--modal {
+  color: var(--primary);
+  opacity: 1;
+}
+
 
 .foundation-section {
   position: relative;
@@ -350,6 +409,8 @@ details.section-card summary::-webkit-details-marker { display: none; }
 @media (max-width: 700px) {
   #app { padding: 12px; }
   .hero, .progress-card, .section-heading, .foundation-hero { grid-template-columns: 1fr; display: grid; }
+  .dashboard-section__meta { justify-content: flex-start; }
+  .modal-backdrop { padding: 16px; }
   .progress-right { min-width: 0; width: 100%; }
   .foundation-shell { padding: 22px 18px; }
   .foundation-meta { min-width: 0; justify-items: start; }

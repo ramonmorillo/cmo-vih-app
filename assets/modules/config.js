@@ -1,5 +1,6 @@
 export const APP_VERSION = 'CMO-VIH Pro v2 — March 2026';
 export const STORAGE_KEY = 'cmo-vih-pro-v2-state';
+export const CASE_LIBRARY_KEY = 'cmo-vih-pro-v2-cases';
 
 export const FIELD_DEFINITIONS = [
   {

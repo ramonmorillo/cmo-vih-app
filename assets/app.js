@@ -4,14 +4,19 @@ import { evaluateCase } from './modules/cmo-engine.js';
 import {
   applyImportedRecord,
   createDefaultState,
+  hasCaseData,
   loadState,
   parseCsvImport,
   parseJsonImport,
+  resetCase,
+  saveCase,
   saveState,
+  setNewCaseModal,
   setOverride,
   updateClinician,
   updateField,
-  updateNarrative
+  updateNarrative,
+  updateUi
 } from './modules/data-layer.js';
 import {
   buildClinicalSummary,
@@ -33,6 +38,11 @@ function recomputeAnalysis() {
 function persistAndRender() {
   recomputeAnalysis();
   state = saveState(state);
+  render();
+}
+
+function renderOnly() {
+  recomputeAnalysis();
   render();
 }
 
@@ -86,6 +96,7 @@ function handleImport() {
   try {
     const record = importType === 'json' ? parseJsonImport(raw) : parseCsvImport(raw);
     state = applyImportedRecord(state, record, 'import');
+    state = updateUi(state, { importType });
     persistAndRender();
   } catch (error) {
     window.alert(`${t('inputs.importError')}: ${error.message}`);
@@ -107,6 +118,46 @@ function handleClinicianUpdate() {
     center: document.getElementById('centerName').value
   });
   persistAndRender();
+}
+
+function handleImportTypeChange(event) {
+  state = updateUi(state, { importType: event.target.value });
+  persistAndRender();
+}
+
+function closeNewCaseModal(shouldPersist = false) {
+  state = setNewCaseModal(state, false);
+  if (shouldPersist) {
+    persistAndRender();
+    return;
+  }
+  renderOnly();
+}
+
+function startFreshCase(shouldSaveCurrentCase) {
+  let archivedCase = null;
+
+  if (shouldSaveCurrentCase && hasCaseData(state.patientCase)) {
+    recomputeAnalysis();
+    archivedCase = saveCase(state);
+  }
+
+  state = resetCase(state);
+  persistAndRender();
+
+  if (archivedCase) {
+    window.alert(t('newCase.savedMessage', { id: archivedCase.id }));
+  }
+}
+
+function handleNewCaseClick() {
+  if (!hasCaseData(state.patientCase)) {
+    startFreshCase(false);
+    return;
+  }
+
+  state = setNewCaseModal(state, true);
+  renderOnly();
 }
 
 function exportSummary() {
@@ -139,6 +190,7 @@ function bindEvents() {
   document.getElementById('analyzeTextBtn')?.addEventListener('click', handleAnalyzeText);
   document.getElementById('loadExampleBtn')?.addEventListener('click', handleLoadExample);
   document.getElementById('importBtn')?.addEventListener('click', handleImport);
+  document.getElementById('importType')?.addEventListener('change', handleImportTypeChange);
   document.getElementById('recalculateBtn')?.addEventListener('click', handleOverride);
   document.getElementById('overrideEnabled')?.addEventListener('change', handleOverride);
   document.getElementById('overrideLevel')?.addEventListener('change', handleOverride);
@@ -149,6 +201,16 @@ function bindEvents() {
   document.getElementById('jsonExportBtn')?.addEventListener('click', exportJson);
   document.getElementById('csvExportBtn')?.addEventListener('click', exportCsv);
   document.getElementById('printBtn')?.addEventListener('click', printReport);
+  document.getElementById('newCaseBtn')?.addEventListener('click', handleNewCaseClick);
+  document.getElementById('saveAndCreateCaseBtn')?.addEventListener('click', () => startFreshCase(true));
+  document.getElementById('createWithoutSavingBtn')?.addEventListener('click', () => startFreshCase(false));
+  document.getElementById('cancelNewCaseBtn')?.addEventListener('click', () => closeNewCaseModal(false));
+  document.getElementById('cancelNewCaseBtnSecondary')?.addEventListener('click', () => closeNewCaseModal(false));
+  document.getElementById('newCaseModalBackdrop')?.addEventListener('click', (event) => {
+    if (event.target.id === 'newCaseModalBackdrop') {
+      closeNewCaseModal(false);
+    }
+  });
   document.getElementById('localeSelect')?.addEventListener('change', async (event) => {
     state.locale = event.target.value;
     await loadLocale(state.locale);
@@ -164,9 +226,6 @@ function render() {
 async function init() {
   state = loadState();
   await loadLocale(state.locale || 'en');
-  if (!state.patientCase.narrative) {
-    state.patientCase.narrative = EXAMPLE_CASE.narrative;
-  }
   FIELD_DEFINITIONS.forEach((field) => {
     if (!state.patientCase.fields[field.id]) {
       state.patientCase.fields[field.id] = { value: '', status: 'missing', source: 'manual', evidence: '', updatedAt: null, clinicianConfirmed: false };

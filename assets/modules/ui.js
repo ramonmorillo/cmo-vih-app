@@ -98,6 +98,7 @@ function renderTraceability(state, analysis) {
 
   return `
     <ul class="trace-list">
+      <li><strong>${t('traceability.caseId')}:</strong> ${state.patientCase.caseId || t('common.none')}</li>
       <li><strong>${t('traceability.timestamp')}:</strong> ${traceability.timestamp || t('common.none')}</li>
       <li><strong>${t('traceability.version')}:</strong> ${APP_VERSION}</li>
       <li><strong>${t('traceability.inputSource')}:</strong> ${traceability.inputSource}</li>
@@ -164,6 +165,32 @@ function renderInterventions(analysis) {
   return `<ul class="bullet-list">${analysis.interventions.map((item) => `<li>${item}</li>`).join('')}</ul>`;
 }
 
+function renderNewCaseModal(state) {
+  if (!state.ui?.modals?.newCase?.open) {
+    return '';
+  }
+
+  return `
+    <div class="modal-backdrop" id="newCaseModalBackdrop">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="newCaseModalTitle">
+        <div class="modal-card__header">
+          <div>
+            <p class="eyebrow eyebrow--modal">${t('newCase.eyebrow')}</p>
+            <h2 id="newCaseModalTitle">${t('newCase.title')}</h2>
+          </div>
+          <button type="button" class="icon-button" id="cancelNewCaseBtn" aria-label="${t('newCase.cancel')}">×</button>
+        </div>
+        <p class="modal-card__body">${t('newCase.prompt')}</p>
+        <div class="modal-card__actions">
+          <button id="saveAndCreateCaseBtn">${t('newCase.saveAndCreate')}</button>
+          <button id="createWithoutSavingBtn" class="button-secondary">${t('newCase.createWithoutSaving')}</button>
+          <button id="cancelNewCaseBtnSecondary" class="button-ghost">${t('newCase.cancel')}</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 export function renderApp(state) {
   const completion = computeCompletion(state.patientCase.fields);
   const analysis = state.analysis;
@@ -178,6 +205,10 @@ export function renderApp(state) {
           <p class="hero__subtitle">${t('header.subtitle')}</p>
         </div>
         <div class="hero__actions">
+          <button id="newCaseBtn" class="button-primary button-with-icon">
+            <span class="button-icon" aria-hidden="true">＋</span>
+            <span>${t('buttons.newCase')}</span>
+          </button>
           <label class="locale-switcher">
             <span>${t('header.language')}</span>
             <select id="localeSelect">
@@ -188,7 +219,6 @@ export function renderApp(state) {
           <div class="version-pill">${APP_VERSION}</div>
         </div>
       </header>
-
 
       <section class="progress-card">
         <div>
@@ -207,7 +237,10 @@ export function renderApp(state) {
             <p class="eyebrow">${t('dashboard.eyebrow')}</p>
             <h2>${t('dashboard.title')}</h2>
           </div>
-          <span class="autosave-pill">${t('traceability.autosave')}: ${state.autosave.lastSavedAt ? new Date(state.autosave.lastSavedAt).toLocaleString(state.locale) : t('common.none')}</span>
+          <div class="dashboard-section__meta">
+            <span class="case-pill">${t('traceability.caseId')}: ${state.patientCase.caseId}</span>
+            <span class="autosave-pill">${t('traceability.autosave')}: ${state.autosave.lastSavedAt ? new Date(state.autosave.lastSavedAt).toLocaleString(state.locale) : t('common.none')}</span>
+          </div>
         </div>
         ${renderDashboard(analysis)}
       </section>
@@ -224,7 +257,7 @@ export function renderApp(state) {
           <details class="section-card" open>
             <summary>${t('inputs.textSection')}</summary>
             <div class="section-body">
-              <textarea id="narrativeInput" placeholder="${t('inputs.textPlaceholder')}">${state.patientCase.narrative || EXAMPLE_CASE.narrative}</textarea>
+              <textarea id="narrativeInput" placeholder="${t('inputs.textPlaceholder')}">${state.patientCase.narrative || ''}</textarea>
               <div class="button-row">
                 <button id="analyzeTextBtn">${t('buttons.analyzeText')}</button>
                 <button id="loadExampleBtn" class="button-secondary">${t('buttons.loadExample')}</button>
@@ -237,8 +270,8 @@ export function renderApp(state) {
             <summary>${t('inputs.importSection')}</summary>
             <div class="section-body">
               <select id="importType">
-                <option value="json">JSON</option>
-                <option value="csv">CSV</option>
+                <option value="json" ${state.ui.importType === 'json' ? 'selected' : ''}>JSON</option>
+                <option value="csv" ${state.ui.importType === 'csv' ? 'selected' : ''}>CSV</option>
               </select>
               <textarea id="importInput" placeholder="${t('inputs.importPlaceholder')}">${state.patientCase.importRaw || ''}</textarea>
               <button id="importBtn" class="button-secondary">${t('buttons.import')}</button>
@@ -324,10 +357,10 @@ export function renderApp(state) {
             <summary>${t('settings.title')}</summary>
             <div class="section-body">
               <label>${t('settings.clinicianName')}
-                <input id="clinicianName" type="text" value="${state.patientCase.clinician.name || ''}" placeholder="${t('settings.clinicianNamePlaceholder')}">
+                <input id="clinicianName" value="${state.patientCase.clinician.name || ''}" placeholder="${t('settings.clinicianNamePlaceholder')}">
               </label>
               <label>${t('settings.centerName')}
-                <input id="centerName" type="text" value="${state.patientCase.clinician.center || ''}" placeholder="${t('settings.centerNamePlaceholder')}">
+                <input id="centerName" value="${state.patientCase.clinician.center || ''}" placeholder="${t('settings.centerNamePlaceholder')}">
               </label>
             </div>
           </details>
@@ -335,6 +368,7 @@ export function renderApp(state) {
       </main>
 
       ${renderFoundationSection()}
+      ${renderNewCaseModal(state)}
     </div>
   `;
 }
