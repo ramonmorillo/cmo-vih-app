@@ -7,6 +7,7 @@ import {
   SECTION_ORDER
 } from './config.js';
 import { t } from './i18n.js';
+import { renderFoundationSection } from './foundation-section.js';
 import { computeCompletion } from './data-layer.js';
 
 function stateBadge(status, translate) {
@@ -166,13 +167,6 @@ function renderInterventions(analysis) {
 export function renderApp(state) {
   const completion = computeCompletion(state.patientCase.fields);
   const analysis = state.analysis;
-  const legalItems = [
-    t('legal.clinicalDisclaimer'),
-    t('legal.aiDisclaimer'),
-    t('legal.privacyDisclaimer'),
-    t('legal.regulatoryDisclaimer'),
-    t('legal.ipDisclaimer')
-  ];
 
   document.title = `${APP_VERSION}`;
   document.getElementById('app').innerHTML = `
@@ -195,9 +189,6 @@ export function renderApp(state) {
         </div>
       </header>
 
-      <section class="legal-strip">
-        ${legalItems.map((item) => `<span>${item}</span>`).join('')}
-      </section>
 
       <section class="progress-card">
         <div>
@@ -343,10 +334,7 @@ export function renderApp(state) {
         </section>
       </main>
 
-      <footer class="app-footer">
-        <p>${APP_VERSION}</p>
-        <p>${t('footer.description')}</p>
-      </footer>
+      ${renderFoundationSection()}
     </div>
   `;
 }

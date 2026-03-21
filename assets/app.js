@@ -21,7 +21,6 @@ import {
   downloadBlob
 } from './modules/export-layer.js';
 import { loadLocale, t } from './modules/i18n.js';
-import { getLegalHighlights } from './modules/legal-module.js';
 import { renderApp } from './modules/ui.js';
 
 let state = createDefaultState();
@@ -158,7 +157,7 @@ function bindEvents() {
 }
 
 function render() {
-  renderApp(state, getLegalHighlights(t));
+  renderApp(state);
   bindEvents();
 }
 

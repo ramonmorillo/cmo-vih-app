@@ -247,6 +247,35 @@
     "ipDisclaimer": "CMO-VIH Pro v2 — March 2026. Todos los derechos reservados. Prohibida su reproducción sin permiso."
   },
   "footer": {
-    "description": "Diseñado para soporte piloto del flujo de atención farmacéutica en VIH, estratificación explicable y expansión escalable con IA."
+    "sectionEyebrow": "Marco científico, legal y de autoría",
+    "sectionTitle": "Base científica y marco de uso clínico",
+    "sectionIntro": "CMO-VIH Pro v2 incorpora una capa final estructurada para posicionamiento científico, protección legal prudente y autoría visible dentro de una interfaz clínica contemporánea.",
+    "tagSupport": "Soporte clínico",
+    "tagScientific": "Base científica",
+    "tagBilingual": "Preparado para bilingüe",
+    "aboutTitle": "Sobre la herramienta",
+    "aboutBody": "CMO-VIH Pro v2 — March 2026 es un sistema digital de apoyo a la estratificación farmacéutica en personas con VIH, basado en el modelo CMO (Capacidad, Motivación y Oportunidad) y diseñado para soporte piloto, investigación aplicada y evolución escalable con IA.",
+    "scientificTitle": "Base científica",
+    "scientificBody": "Esta herramienta digital se fundamenta en el modelo CMO de atención farmacéutica y en evidencia clínica publicada sobre su impacto en personas con VIH. Se apoya en el trabajo de Ramón Morillo-Verdugo y colaboradores y refleja un modelo con impacto clínico documentado en esta población.",
+    "scientificReferenceLabel": "Publicación de referencia",
+    "scientificReferenceTitle": "Clinical Impact of the Capacity-Motivation-Opportunity Pharmacist-Led Intervention in People Living with HIV in Spain, 2019–2020.",
+    "scientificReferenceMeta": "Morillo-Verdugo R, Robustillo-Cortés MA, et al. · Journal of Multidisciplinary Healthcare · 2022",
+    "authorshipTitle": "Autoría",
+    "authorshipBody": "La autoría se muestra de forma explícita para preservar la continuidad científica entre el marco conceptual CMO, su traducción a flujos digitales y su futura expansión metodológica.",
+    "authorshipCreator": "Herramienta creada por Ramón Morillo-Verdugo",
+    "authorshipRole": "Concepto, autoría y dirección científica",
+    "disclaimerTitle": "Aviso clínico",
+    "disclaimerBody": "Se trata de una herramienta de apoyo clínico. No sustituye el juicio profesional, y cualquier resultado debe ser interpretado por un profesional sanitario cualificado dentro del contexto clínico completo.",
+    "privacyTitle": "Privacidad e investigación",
+    "privacyBody": "La aplicación está estructurada para un uso prudente en privacidad y trabajo metodológico, favoreciendo la ejecución local en navegador, el uso de datos seudonimizados y los flujos de exportación orientados a investigación cuando proceda.",
+    "privacyPointLocal": "Arquitectura de procesamiento local en navegador en esta versión estática.",
+    "privacyPointPseudonymized": "Se recomienda emplear datos seudonimizados o desidentificados siempre que sea posible.",
+    "privacyPointResearch": "Adecuada para metodología de investigación, exportaciones estructuradas y analítica piloto.",
+    "ipTitle": "Propiedad intelectual",
+    "ipBody": "Este contenido, su estructura y su capa de presentación permanecen protegidos como propiedad intelectual. No se permite su reproducción, distribución, transformación o reutilización sin autorización previa.",
+    "ipNotice": "© 2026 Ramón Morillo-Verdugo",
+    "ipRights": "Todos los derechos reservados.",
+    "bottomCreator": "Herramienta creada por Ramón Morillo-Verdugo",
+    "bottomRights": "© 2026 Ramón Morillo-Verdugo · Todos los derechos reservados."
   }
 }
