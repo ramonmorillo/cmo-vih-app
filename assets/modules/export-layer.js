@@ -3,6 +3,8 @@ import { APP_VERSION } from './config.js';
 export function buildClinicalSummary(state, analysis, translate) {
   return [
     `${translate('exports.summaryTitle')}: ${analysis.priorityLabel}`,
+    `${translate('traceability.caseId')}: ${state.patientCase.caseId}`,
+    `${translate('savedCases.patientLabel')}: ${state.patientCase.pseudonymizedPatientLabel || translate('common.none')}`,
     `${translate('exports.totalScore')}: ${analysis.total}`,
     `${translate('exports.followUp')}: ${analysis.followUp}`,
     `${translate('exports.keyDrivers')}: ${analysis.explainability.keyDrivers.map((item) => item.label).join(', ') || translate('common.none')}`,
@@ -16,6 +18,11 @@ export function buildStructuredReport(state, analysis, translate) {
   return {
     version: APP_VERSION,
     locale: state.locale,
+    caseId: state.patientCase.caseId,
+    createdAt: state.patientCase.createdAt,
+    updatedAt: state.patientCase.updatedAt,
+    pseudonymizedPatientLabel: state.patientCase.pseudonymizedPatientLabel,
+    storageRecommendation: translate('savedCases.helperStorage', { storage: translate(`savedCases.storageMode.${state.savedCases.storageMode}`) }),
     clinician: state.patientCase.clinician,
     traceability: analysis.traceability,
     narrative: state.patientCase.narrative,
@@ -35,10 +42,12 @@ export function buildStructuredReport(state, analysis, translate) {
   };
 }
 
-export function buildCsvExport(state, analysis, translate) {
-  const headers = ['version', 'timestamp', 'source', 'finalLevel', 'totalScore', 'followUp', 'riskFlags'];
+export function buildCsvExport(state, analysis) {
+  const headers = ['version', 'caseId', 'patientLabel', 'timestamp', 'source', 'finalLevel', 'totalScore', 'followUp', 'riskFlags'];
   const row = [
     APP_VERSION,
+    state.patientCase.caseId,
+    state.patientCase.pseudonymizedPatientLabel || '',
     analysis.traceability.timestamp,
     analysis.traceability.inputSource,
     analysis.finalLevel,
@@ -67,6 +76,8 @@ export function buildPrintableHtml(state, analysis, translate) {
       </head>
       <body>
         <h1>${APP_VERSION}</h1>
+        <p class="muted">${translate('traceability.caseId')}: ${state.patientCase.caseId}</p>
+        <p class="muted">${translate('savedCases.patientLabel')}: ${state.patientCase.pseudonymizedPatientLabel || translate('common.none')}</p>
         <p class="muted">${translate('exports.timestamp')}: ${analysis.traceability.timestamp}</p>
         <div class="panel">
           <h2>${translate('exports.summaryTitle')}</h2>

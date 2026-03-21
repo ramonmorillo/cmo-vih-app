@@ -20,7 +20,10 @@
     "exportJson": "Research JSON",
     "exportCsv": "Research CSV",
     "print": "Printable report",
-    "newCase": "New patient / New case"
+    "newCase": "New patient / New case",
+    "save": "Save",
+    "savedCases": "Saved cases",
+    "export": "Export"
   },
   "progress": {
     "title": "Workflow completion",
@@ -239,7 +242,10 @@
     "clinicianName": "Clinician name",
     "clinicianNamePlaceholder": "Responsible clinician",
     "centerName": "Center / service",
-    "centerNamePlaceholder": "Hospital or pharmacy service"
+    "centerNamePlaceholder": "Hospital or pharmacy service",
+    "patientLabel": "Pseudonymized patient label",
+    "patientLabelPlaceholder": "Example: Clinic-A-042 or Pseudonym-07",
+    "patientLabelHelp": "Use pseudonymized labels only. Avoid names, initials, record numbers, dates of birth, or other direct identifiers."
   },
   "legal": {
     "clinicalDisclaimer": "Clinical decision support only — not a substitute for clinician judgment.",
@@ -288,5 +294,49 @@
     "createWithoutSaving": "Create new without saving",
     "cancel": "Cancel",
     "savedMessage": "Current case saved locally as {id}. A fresh case is now ready."
+  },
+  "savedCases": {
+    "title": "Saved Cases / Casos guardados",
+    "save": "Save case",
+    "saveAsNew": "Save as new case",
+    "updateExisting": "Update existing case",
+    "searchCaseId": "Search by case ID",
+    "searchCaseIdPlaceholder": "Filter by case ID",
+    "searchPatientLabel": "Search by patient label",
+    "searchPatientLabelPlaceholder": "Filter by pseudonymized patient label",
+    "sortBy": "Sort by",
+    "sort": {
+      "updatedDesc": "Updated date (newest first)",
+      "updatedAsc": "Updated date (oldest first)",
+      "createdDesc": "Created date (newest first)",
+      "createdAsc": "Created date (oldest first)",
+      "patientLabelAsc": "Patient label (A-Z)",
+      "patientLabelDesc": "Patient label (Z-A)"
+    },
+    "open": "Open case",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "exportJson": "Export JSON",
+    "empty": "No saved cases match the current filters.",
+    "patientLabel": "Patient label",
+    "noLabel": "No pseudonymized label",
+    "score": "Score",
+    "inputSource": "Input source",
+    "updatedAt": "Updated",
+    "storageLocation": "Saved in",
+    "storageMode": {
+      "indexeddb": "IndexedDB in this browser",
+      "localstorage": "localStorage fallback in this browser"
+    },
+    "helperStorage": "Saved cases stay only on this device in {storage}. No server backend is used.",
+    "helperPrivacy": "Use pseudonymized labels only and avoid direct personal identifiers in saved cases.",
+    "savedMessage": "Case {caseId} saved locally.",
+    "updatedMessage": "Case {caseId} updated locally.",
+    "duplicatedMessage": "Case duplicated as {caseId}.",
+    "confirmDelete": "Delete saved case {caseId} from this browser?",
+    "notFound": "Saved case {caseId} was not found.",
+    "updateMissing": "This case has not been saved before. Use “Save case” or “Save as new case” first.",
+    "copySuffix": "copy",
+    "copyLabel": "Copy of {caseId}"
   }
 }

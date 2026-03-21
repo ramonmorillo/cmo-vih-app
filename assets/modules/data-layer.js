@@ -1,120 +1,35 @@
-import { APP_VERSION, CASE_LIBRARY_KEY, FIELD_DEFINITIONS, STORAGE_KEY } from './config.js';
+import { APP_VERSION, FIELD_DEFINITIONS, STORAGE_KEY } from './config.js';
+import {
+  buildNewPatientCase,
+  cloneState,
+  createCaseId,
+  createDefaultState,
+  createUiState,
+  normalizePatientCase
+} from './case-model.js';
+import { filterAndSortCases } from './case-search.js';
 
-function createEmptyField() {
-  return {
-    value: '',
-    status: 'missing',
-    source: 'manual',
-    evidence: '',
-    updatedAt: null,
-    clinicianConfirmed: false
-  };
-}
+export { createDefaultState };
 
-function createCaseId() {
-  return `case-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function createUiState() {
-  return {
-    importType: 'json',
-    modals: {
-      newCase: {
-        open: false
-      }
-    }
-  };
-}
-
-function buildNewPatientCase(overrides = {}) {
-  return {
-    caseId: createCaseId(),
-    narrative: '',
-    importRaw: '',
-    source: 'manual',
-    fields: Object.fromEntries(FIELD_DEFINITIONS.map((field) => [field.id, createEmptyField()])),
-    notes: '',
-    override: {
-      enabled: false,
-      level: 'auto',
-      reason: ''
-    },
-    traceability: {
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      modifications: []
-    },
-    clinician: {
-      name: '',
-      center: ''
-    },
-    ...overrides
-  };
-}
-
-export function createDefaultState() {
-  return {
-    locale: 'en',
-    version: APP_VERSION,
-    patientCase: buildNewPatientCase(),
-    analysis: null,
-    autosave: {
-      status: 'idle',
-      lastSavedAt: null
-    },
-    ui: createUiState()
-  };
-}
-
-export function cloneState(state) {
-  return JSON.parse(JSON.stringify(state));
-}
-
-export function saveState(state) {
-  const nextState = cloneState(state);
-  nextState.autosave = {
-    status: 'saved',
-    lastSavedAt: new Date().toISOString()
-  };
-  nextState.patientCase.traceability.updatedAt = new Date().toISOString();
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState));
-  return nextState;
-}
-
-export function loadState() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) {
-    return createDefaultState();
-  }
-
-  const parsed = JSON.parse(saved);
+function applyStateDefaults(parsed = {}) {
   const base = createDefaultState();
   const merged = {
     ...base,
     ...parsed,
-    patientCase: {
-      ...base.patientCase,
-      ...parsed.patientCase,
-      fields: {
-        ...base.patientCase.fields,
-        ...(parsed.patientCase?.fields || {})
-      },
-      override: {
-        ...base.patientCase.override,
-        ...(parsed.patientCase?.override || {})
-      },
-      traceability: {
-        ...base.patientCase.traceability,
-        ...(parsed.patientCase?.traceability || {})
-      },
-      clinician: {
-        ...base.patientCase.clinician,
-        ...(parsed.patientCase?.clinician || {})
-      }
-    },
+    patientCase: normalizePatientCase(parsed.patientCase || {}, parsed.locale || base.locale),
     autosave: {
-      status: 'saved',
-      lastSavedAt: parsed.autosave?.lastSavedAt || null
+      ...base.autosave,
+      ...(parsed.autosave || {})
+    },
+    savedCases: {
+      ...base.savedCases,
+      ...(parsed.savedCases || {}),
+      items: Array.isArray(parsed.savedCases?.items) ? parsed.savedCases.items : [],
+      filteredItems: [],
+      filters: {
+        ...base.savedCases.filters,
+        ...(parsed.savedCases?.filters || {})
+      }
     },
     ui: {
       ...base.ui,
@@ -127,22 +42,43 @@ export function loadState() {
           ...(parsed.ui?.modals?.newCase || {}),
           open: false
         }
-      }
+      },
+      unsavedChanges: false
     }
   };
 
-  FIELD_DEFINITIONS.forEach((field) => {
-    merged.patientCase.fields[field.id] = {
-      ...createEmptyField(),
-      ...merged.patientCase.fields[field.id]
-    };
-  });
+  merged.patientCase.toolVersion = APP_VERSION;
+  merged.patientCase.language = merged.locale;
+  merged.savedCases.filteredItems = filterAndSortCases(merged.savedCases.items, merged.savedCases.filters);
+  return merged;
+}
 
-  if (!merged.patientCase.caseId) {
-    merged.patientCase.caseId = createCaseId();
+export function saveState(state) {
+  const nextState = cloneState(state);
+  nextState.autosave = {
+    status: 'saved',
+    lastSavedAt: new Date().toISOString()
+  };
+  nextState.patientCase.updatedAt = new Date().toISOString();
+  nextState.patientCase.toolVersion = APP_VERSION;
+  nextState.patientCase.version = APP_VERSION;
+  nextState.patientCase.language = nextState.locale;
+  nextState.patientCase.traceability.updatedAt = nextState.patientCase.updatedAt;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState));
+  return nextState;
+}
+
+export function loadState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) {
+    return createDefaultState();
   }
 
-  return merged;
+  try {
+    return applyStateDefaults(JSON.parse(saved));
+  } catch {
+    return createDefaultState();
+  }
 }
 
 export function updateUi(state, payload) {
@@ -158,6 +94,26 @@ export function updateUi(state, payload) {
   return next;
 }
 
+export function setSavedCases(state, items, storageMode, error = null) {
+  const next = cloneState(state);
+  next.savedCases.items = items;
+  next.savedCases.filteredItems = filterAndSortCases(items, next.savedCases.filters);
+  next.savedCases.storageMode = storageMode || next.savedCases.storageMode;
+  next.savedCases.error = error;
+  next.savedCases.lastLoadedAt = new Date().toISOString();
+  return next;
+}
+
+export function updateSavedCasesFilters(state, payload) {
+  const next = cloneState(state);
+  next.savedCases.filters = {
+    ...next.savedCases.filters,
+    ...payload
+  };
+  next.savedCases.filteredItems = filterAndSortCases(next.savedCases.items, next.savedCases.filters);
+  return next;
+}
+
 export function setNewCaseModal(state, open) {
   return updateUi(state, {
     modals: {
@@ -168,6 +124,17 @@ export function setNewCaseModal(state, open) {
       }
     }
   });
+}
+
+function markCaseDirty(next) {
+  next.ui.unsavedChanges = true;
+  return next;
+}
+
+export function markCaseClean(state) {
+  const next = cloneState(state);
+  next.ui.unsavedChanges = false;
+  return next;
 }
 
 export function updateField(state, fieldId, payload) {
@@ -184,10 +151,14 @@ export function updateField(state, fieldId, payload) {
     at: new Date().toISOString(),
     value: payload.value
   });
-  return next;
+  next.patientCase.source = payload.source === 'import'
+    ? 'import'
+    : (payload.source === 'ai' || next.patientCase.source === 'text' ? 'text' : 'manual');
+  next.patientCase.updatedAt = new Date().toISOString();
+  return markCaseDirty(next);
 }
 
-export function updateNarrative(state, narrative, source = 'manual') {
+export function updateNarrative(state, narrative, source = 'text') {
   const next = cloneState(state);
   next.patientCase.narrative = narrative;
   next.patientCase.source = source;
@@ -196,7 +167,8 @@ export function updateNarrative(state, narrative, source = 'manual') {
     source,
     at: new Date().toISOString()
   });
-  return next;
+  next.patientCase.updatedAt = new Date().toISOString();
+  return markCaseDirty(next);
 }
 
 export function updateClinician(state, clinician) {
@@ -209,7 +181,19 @@ export function updateClinician(state, clinician) {
     type: 'clinician-update',
     at: new Date().toISOString()
   });
-  return next;
+  next.patientCase.updatedAt = new Date().toISOString();
+  return markCaseDirty(next);
+}
+
+export function updatePatientLabel(state, pseudonymizedPatientLabel) {
+  const next = cloneState(state);
+  next.patientCase.pseudonymizedPatientLabel = pseudonymizedPatientLabel;
+  next.patientCase.traceability.modifications.push({
+    type: 'patient-label-update',
+    at: new Date().toISOString()
+  });
+  next.patientCase.updatedAt = new Date().toISOString();
+  return markCaseDirty(next);
 }
 
 export function setOverride(state, override) {
@@ -223,7 +207,8 @@ export function setOverride(state, override) {
     at: new Date().toISOString(),
     override: next.patientCase.override
   });
-  return next;
+  next.patientCase.updatedAt = new Date().toISOString();
+  return markCaseDirty(next);
 }
 
 function normalizeImportedValue(rawValue) {
@@ -253,9 +238,14 @@ export function applyImportedRecord(state, record, source = 'import') {
     next = updateNarrative(next, normalizedRecord.narrative, source);
   }
 
+  if (normalizedRecord.pseudonymizedPatientLabel) {
+    next = updatePatientLabel(next, normalizedRecord.pseudonymizedPatientLabel);
+  }
+
   next.patientCase.importRaw = JSON.stringify(normalizedRecord, null, 2);
   next.patientCase.source = source;
-  return next;
+  next.patientCase.updatedAt = new Date().toISOString();
+  return markCaseDirty(next);
 }
 
 export function parseJsonImport(text) {
@@ -281,51 +271,13 @@ export function computeCompletion(fields) {
 
 export function hasCaseData(patientCase) {
   return Boolean(
-    patientCase.narrative?.trim()
+    patientCase.pseudonymizedPatientLabel?.trim()
+    || patientCase.narrative?.trim()
     || patientCase.importRaw?.trim()
     || patientCase.notes?.trim()
     || patientCase.override?.reason?.trim()
     || FIELD_DEFINITIONS.some((field) => patientCase.fields[field.id]?.value)
   );
-}
-
-function readStoredCases() {
-  try {
-    return JSON.parse(localStorage.getItem(CASE_LIBRARY_KEY) || '[]');
-  } catch {
-    return [];
-  }
-}
-
-function getCaseLabelValue(fieldState) {
-  return fieldState?.value || null;
-}
-
-export function saveCase(state) {
-  const existingCases = readStoredCases();
-  const archivedAt = new Date().toISOString();
-  const record = {
-    id: state.patientCase.caseId,
-    archivedAt,
-    startedAt: state.patientCase.traceability.createdAt,
-    updatedAt: state.patientCase.traceability.updatedAt,
-    cmoLevel: state.analysis?.priorityLabel || null,
-    cmoScore: state.analysis?.total ?? null,
-    followUp: state.analysis?.followUp || null,
-    source: state.patientCase.source,
-    keyVariables: {
-      ageBand: getCaseLabelValue(state.patientCase.fields.ageBand),
-      pregnancy: getCaseLabelValue(state.patientCase.fields.pregnancy),
-      viralLoad: getCaseLabelValue(state.patientCase.fields.viralLoad),
-      adherenceArt: getCaseLabelValue(state.patientCase.fields.adherenceArt),
-      frailty: getCaseLabelValue(state.patientCase.fields.frailty),
-      hospitalization: getCaseLabelValue(state.patientCase.fields.hospitalization)
-    }
-  };
-
-  const nextCases = [record, ...existingCases.filter((item) => item.id !== record.id)];
-  localStorage.setItem(CASE_LIBRARY_KEY, JSON.stringify(nextCases));
-  return record;
 }
 
 export function resetCase(state, options = {}) {
@@ -335,7 +287,8 @@ export function resetCase(state, options = {}) {
     : { ...next.patientCase.clinician };
 
   next.patientCase = buildNewPatientCase({
-    clinician: preservedClinician
+    clinician: preservedClinician,
+    language: state.locale
   });
   next.analysis = null;
   next.autosave = {
@@ -345,5 +298,19 @@ export function resetCase(state, options = {}) {
   next.ui = createUiState();
   next.locale = state.locale;
   next.version = APP_VERSION;
+  return next;
+}
+
+export function duplicateCurrentCase(state) {
+  const next = cloneState(state);
+  const timestamp = new Date().toISOString();
+  next.patientCase.caseId = createCaseId();
+  next.patientCase.createdAt = timestamp;
+  next.patientCase.updatedAt = timestamp;
+  next.patientCase.traceability.createdAt = timestamp;
+  next.patientCase.traceability.updatedAt = timestamp;
+  next.patientCase.toolVersion = APP_VERSION;
+  next.patientCase.version = APP_VERSION;
+  next.ui.unsavedChanges = true;
   return next;
 }

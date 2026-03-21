@@ -20,7 +20,10 @@
     "exportJson": "JSON de investigación",
     "exportCsv": "CSV de investigación",
     "print": "Informe imprimible",
-    "newCase": "Nuevo paciente / Nuevo caso"
+    "newCase": "Nuevo paciente / Nuevo caso",
+    "save": "Guardar",
+    "savedCases": "Casos guardados",
+    "export": "Exportar"
   },
   "progress": {
     "title": "Progreso del flujo",
@@ -239,7 +242,10 @@
     "clinicianName": "Nombre del clínico",
     "clinicianNamePlaceholder": "Clínico responsable",
     "centerName": "Centro / servicio",
-    "centerNamePlaceholder": "Hospital o servicio de farmacia"
+    "centerNamePlaceholder": "Hospital o servicio de farmacia",
+    "patientLabel": "Etiqueta seudonimizada del paciente",
+    "patientLabelPlaceholder": "Ejemplo: Centro-A-042 o Seudónimo-07",
+    "patientLabelHelp": "Use solo etiquetas seudonimizadas. Evite nombres, iniciales, números de historia, fechas de nacimiento u otros identificadores directos."
   },
   "legal": {
     "clinicalDisclaimer": "Soporte a la decisión clínica únicamente; no sustituye el juicio profesional.",
@@ -288,5 +294,49 @@
     "createWithoutSaving": "Crear nuevo sin guardar",
     "cancel": "Cancelar",
     "savedMessage": "El caso actual se guardó localmente como {id}. Ya hay un caso nuevo listo."
+  },
+  "savedCases": {
+    "title": "Saved Cases / Casos guardados",
+    "save": "Guardar caso",
+    "saveAsNew": "Guardar como caso nuevo",
+    "updateExisting": "Actualizar caso existente",
+    "searchCaseId": "Buscar por ID del caso",
+    "searchCaseIdPlaceholder": "Filtrar por ID del caso",
+    "searchPatientLabel": "Buscar por etiqueta del paciente",
+    "searchPatientLabelPlaceholder": "Filtrar por etiqueta seudonimizada",
+    "sortBy": "Ordenar por",
+    "sort": {
+      "updatedDesc": "Fecha de actualización (más reciente primero)",
+      "updatedAsc": "Fecha de actualización (más antigua primero)",
+      "createdDesc": "Fecha de creación (más reciente primero)",
+      "createdAsc": "Fecha de creación (más antigua primero)",
+      "patientLabelAsc": "Etiqueta del paciente (A-Z)",
+      "patientLabelDesc": "Etiqueta del paciente (Z-A)"
+    },
+    "open": "Abrir caso",
+    "duplicate": "Duplicar",
+    "delete": "Eliminar",
+    "exportJson": "Exportar JSON",
+    "empty": "No hay casos guardados que coincidan con los filtros actuales.",
+    "patientLabel": "Etiqueta del paciente",
+    "noLabel": "Sin etiqueta seudonimizada",
+    "score": "Puntuación",
+    "inputSource": "Fuente de entrada",
+    "updatedAt": "Actualizado",
+    "storageLocation": "Guardado en",
+    "storageMode": {
+      "indexeddb": "IndexedDB en este navegador",
+      "localstorage": "respaldo en localStorage en este navegador"
+    },
+    "helperStorage": "Los casos guardados permanecen solo en este dispositivo dentro de {storage}. No se utiliza ningún servidor.",
+    "helperPrivacy": "Utilice solo etiquetas seudonimizadas y evite identificadores personales directos en los casos guardados.",
+    "savedMessage": "El caso {caseId} se guardó localmente.",
+    "updatedMessage": "El caso {caseId} se actualizó localmente.",
+    "duplicatedMessage": "El caso se duplicó como {caseId}.",
+    "confirmDelete": "¿Eliminar el caso guardado {caseId} de este navegador?",
+    "notFound": "No se encontró el caso guardado {caseId}.",
+    "updateMissing": "Este caso aún no se ha guardado. Utilice primero “Guardar caso” o “Guardar como caso nuevo”.",
+    "copySuffix": "copia",
+    "copyLabel": "Copia de {caseId}"
   }
 }
