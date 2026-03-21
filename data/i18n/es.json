@@ -19,7 +19,8 @@
     "exportSummary": "Resumen clínico",
     "exportJson": "JSON de investigación",
     "exportCsv": "CSV de investigación",
-    "print": "Informe imprimible"
+    "print": "Informe imprimible",
+    "newCase": "Nuevo paciente / Nuevo caso"
   },
   "progress": {
     "title": "Progreso del flujo",
@@ -191,7 +192,8 @@
     "modifications": "Modificaciones del clínico",
     "source": "Origen",
     "evidence": "Evidencia",
-    "autosave": "Autoguardado"
+    "autosave": "Autoguardado",
+    "caseId": "ID del caso"
   },
   "explainability": {
     "title": "Panel de explicabilidad",
@@ -277,5 +279,14 @@
     "ipRights": "Todos los derechos reservados.",
     "bottomCreator": "Herramienta creada por Ramón Morillo-Verdugo",
     "bottomRights": "© 2026 Ramón Morillo-Verdugo · Todos los derechos reservados."
+  },
+  "newCase": {
+    "eyebrow": "Gestión de casos",
+    "title": "¿Desea iniciar un nuevo paciente?",
+    "prompt": "Elija cómo abrir un caso nuevo. Puede guardar el caso actual en el almacenamiento local antes de limpiar el flujo o continuar sin guardarlo.",
+    "saveAndCreate": "Guardar caso actual y crear nuevo",
+    "createWithoutSaving": "Crear nuevo sin guardar",
+    "cancel": "Cancelar",
+    "savedMessage": "El caso actual se guardó localmente como {id}. Ya hay un caso nuevo listo."
   }
 }

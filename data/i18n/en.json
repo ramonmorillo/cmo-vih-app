@@ -19,7 +19,8 @@
     "exportSummary": "Clinical summary",
     "exportJson": "Research JSON",
     "exportCsv": "Research CSV",
-    "print": "Printable report"
+    "print": "Printable report",
+    "newCase": "New patient / New case"
   },
   "progress": {
     "title": "Workflow completion",
@@ -191,7 +192,8 @@
     "modifications": "Clinician modifications",
     "source": "Source",
     "evidence": "Evidence",
-    "autosave": "Autosave"
+    "autosave": "Autosave",
+    "caseId": "Case ID"
   },
   "explainability": {
     "title": "Explainability panel",
@@ -277,5 +279,14 @@
     "ipRights": "All rights reserved.",
     "bottomCreator": "Tool created by Ramón Morillo-Verdugo",
     "bottomRights": "© 2026 Ramón Morillo-Verdugo · All rights reserved."
+  },
+  "newCase": {
+    "eyebrow": "Case management",
+    "title": "Do you want to start a new patient?",
+    "prompt": "Choose how to open a fresh case. You can save the current case to local storage before clearing the workflow, or continue without saving it.",
+    "saveAndCreate": "Save current case and create new",
+    "createWithoutSaving": "Create new without saving",
+    "cancel": "Cancel",
+    "savedMessage": "Current case saved locally as {id}. A fresh case is now ready."
   }
 }

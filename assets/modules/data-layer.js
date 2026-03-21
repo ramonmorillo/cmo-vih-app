@@ -1,4 +1,4 @@
-import { APP_VERSION, FIELD_DEFINITIONS, STORAGE_KEY } from './config.js';
+import { APP_VERSION, CASE_LIBRARY_KEY, FIELD_DEFINITIONS, STORAGE_KEY } from './config.js';
 
 function createEmptyField() {
   return {
@@ -11,37 +11,58 @@ function createEmptyField() {
   };
 }
 
+function createCaseId() {
+  return `case-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function createUiState() {
+  return {
+    importType: 'json',
+    modals: {
+      newCase: {
+        open: false
+      }
+    }
+  };
+}
+
+function buildNewPatientCase(overrides = {}) {
+  return {
+    caseId: createCaseId(),
+    narrative: '',
+    importRaw: '',
+    source: 'manual',
+    fields: Object.fromEntries(FIELD_DEFINITIONS.map((field) => [field.id, createEmptyField()])),
+    notes: '',
+    override: {
+      enabled: false,
+      level: 'auto',
+      reason: ''
+    },
+    traceability: {
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      modifications: []
+    },
+    clinician: {
+      name: '',
+      center: ''
+    },
+    ...overrides
+  };
+}
+
 export function createDefaultState() {
-  const fields = Object.fromEntries(FIELD_DEFINITIONS.map((field) => [field.id, createEmptyField()]));
   return {
     locale: 'en',
     version: APP_VERSION,
-    patientCase: {
-      narrative: '',
-      importRaw: '',
-      source: 'manual',
-      fields,
-      notes: '',
-      override: {
-        enabled: false,
-        level: 'auto',
-        reason: ''
-      },
-      traceability: {
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        modifications: []
-      },
-      clinician: {
-        name: '',
-        center: ''
-      }
-    },
+    patientCase: buildNewPatientCase(),
     analysis: null,
     autosave: {
       status: 'idle',
       lastSavedAt: null
-    }
+    },
+    ui: createUiState()
   };
 }
 
@@ -94,6 +115,19 @@ export function loadState() {
     autosave: {
       status: 'saved',
       lastSavedAt: parsed.autosave?.lastSavedAt || null
+    },
+    ui: {
+      ...base.ui,
+      ...(parsed.ui || {}),
+      modals: {
+        ...base.ui.modals,
+        ...(parsed.ui?.modals || {}),
+        newCase: {
+          ...base.ui.modals.newCase,
+          ...(parsed.ui?.modals?.newCase || {}),
+          open: false
+        }
+      }
     }
   };
 
@@ -104,7 +138,36 @@ export function loadState() {
     };
   });
 
+  if (!merged.patientCase.caseId) {
+    merged.patientCase.caseId = createCaseId();
+  }
+
   return merged;
+}
+
+export function updateUi(state, payload) {
+  const next = cloneState(state);
+  next.ui = {
+    ...next.ui,
+    ...payload,
+    modals: {
+      ...next.ui.modals,
+      ...(payload.modals || {})
+    }
+  };
+  return next;
+}
+
+export function setNewCaseModal(state, open) {
+  return updateUi(state, {
+    modals: {
+      ...state.ui.modals,
+      newCase: {
+        ...state.ui.modals.newCase,
+        open
+      }
+    }
+  });
 }
 
 export function updateField(state, fieldId, payload) {
@@ -214,4 +277,73 @@ export function computeCompletion(fields) {
   const total = FIELD_DEFINITIONS.length;
   const completed = FIELD_DEFINITIONS.filter((field) => fields[field.id]?.value).length;
   return Math.round((completed / total) * 100);
+}
+
+export function hasCaseData(patientCase) {
+  return Boolean(
+    patientCase.narrative?.trim()
+    || patientCase.importRaw?.trim()
+    || patientCase.notes?.trim()
+    || patientCase.override?.reason?.trim()
+    || FIELD_DEFINITIONS.some((field) => patientCase.fields[field.id]?.value)
+  );
+}
+
+function readStoredCases() {
+  try {
+    return JSON.parse(localStorage.getItem(CASE_LIBRARY_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function getCaseLabelValue(fieldState) {
+  return fieldState?.value || null;
+}
+
+export function saveCase(state) {
+  const existingCases = readStoredCases();
+  const archivedAt = new Date().toISOString();
+  const record = {
+    id: state.patientCase.caseId,
+    archivedAt,
+    startedAt: state.patientCase.traceability.createdAt,
+    updatedAt: state.patientCase.traceability.updatedAt,
+    cmoLevel: state.analysis?.priorityLabel || null,
+    cmoScore: state.analysis?.total ?? null,
+    followUp: state.analysis?.followUp || null,
+    source: state.patientCase.source,
+    keyVariables: {
+      ageBand: getCaseLabelValue(state.patientCase.fields.ageBand),
+      pregnancy: getCaseLabelValue(state.patientCase.fields.pregnancy),
+      viralLoad: getCaseLabelValue(state.patientCase.fields.viralLoad),
+      adherenceArt: getCaseLabelValue(state.patientCase.fields.adherenceArt),
+      frailty: getCaseLabelValue(state.patientCase.fields.frailty),
+      hospitalization: getCaseLabelValue(state.patientCase.fields.hospitalization)
+    }
+  };
+
+  const nextCases = [record, ...existingCases.filter((item) => item.id !== record.id)];
+  localStorage.setItem(CASE_LIBRARY_KEY, JSON.stringify(nextCases));
+  return record;
+}
+
+export function resetCase(state, options = {}) {
+  const next = cloneState(state);
+  const preservedClinician = options.preserveClinician === false
+    ? { name: '', center: '' }
+    : { ...next.patientCase.clinician };
+
+  next.patientCase = buildNewPatientCase({
+    clinician: preservedClinician
+  });
+  next.analysis = null;
+  next.autosave = {
+    status: 'idle',
+    lastSavedAt: null
+  };
+  next.ui = createUiState();
+  next.locale = state.locale;
+  next.version = APP_VERSION;
+  return next;
 }
