@@ -1,0 +1,252 @@
+{
+  "header": {
+    "eyebrow": "Semi-clinical decision-support system",
+    "subtitle": "Privacy-first HIV pharmaceutical care support tool for pilot clinical workflows, explainable scoring, and AI-assisted text intake.",
+    "language": "Language"
+  },
+  "common": {
+    "none": "None",
+    "selectPlaceholder": "Select an option",
+    "noEvidence": "No evidence captured",
+    "clinicianEntered": "Clinician entered value",
+    "clinicianConfirmed": "Clinician confirmed"
+  },
+  "buttons": {
+    "analyzeText": "Analyze clinical text",
+    "loadExample": "Load example",
+    "import": "Import data",
+    "recalculate": "Recalculate classification",
+    "exportSummary": "Clinical summary",
+    "exportJson": "Research JSON",
+    "exportCsv": "Research CSV",
+    "print": "Printable report"
+  },
+  "progress": {
+    "title": "Workflow completion",
+    "subtitle": "Track how much of the CMO-VIH stratification dataset has been completed."
+  },
+  "dashboard": {
+    "eyebrow": "Clinical dashboard",
+    "title": "Pilot workflow overview",
+    "empty": "Complete manual fields, paste clinical text, or import a record to generate a summary.",
+    "cmoLevel": "CMO level",
+    "totalScore": "Total score",
+    "keyDrivers": "Key drivers",
+    "riskFlags": "Risk flags",
+    "followUpIntensity": "Follow-up intensity",
+    "autoClass": "Automatic classification",
+    "summaryPanel": "Summary panel",
+    "suggestedInterventions": "Suggested interventions"
+  },
+  "inputs": {
+    "manualSection": "Manual structured input",
+    "textSection": "Paste clinical text",
+    "textPlaceholder": "Paste de-identified clinical text here. The AI module extracts structured variables, marks extracted vs inferred data, and leaves unknown items missing.",
+    "importSection": "JSON / CSV import",
+    "importPlaceholder": "Paste a JSON object or a one-line CSV file with matching field IDs.",
+    "futureIntegration": "Prepared for future EHR connectors through the shared case schema. No live integration is implemented in this static version.",
+    "importEmpty": "Paste JSON or CSV content before importing.",
+    "importError": "Import failed"
+  },
+  "sections": {
+    "demographic": "Demographic",
+    "clinical": "Clinical",
+    "pharmacotherapy": "Pharmacotherapy",
+    "healthCare": "Healthcare resource use",
+    "psychosocial": "Psychosocial",
+    "neurocognitive": "Neurocognitive-sensory",
+    "frailty": "Frailty",
+    "socioeconomic": "Socioeconomic",
+    "healthResults": "Health outcomes"
+  },
+  "fields": {
+    "pregnancy": "Pregnancy",
+    "ageBand": "Age band",
+    "comorbidities": "Comorbidity burden",
+    "polypharmacy": "Polypharmacy",
+    "complexity": "Medication complexity index",
+    "adherenceArt": "ART adherence",
+    "adherenceConcomitant": "Concomitant medication adherence",
+    "hospitalization": "Hospitalization in the last 6 months",
+    "qualityOfLife": "Quality of life",
+    "depression": "Depression",
+    "substanceUse": "Substance use",
+    "neurocognitive": "Neurocognitive impairment",
+    "frailty": "Frailty",
+    "socioeconomic": "Socioeconomic vulnerability",
+    "viralLoad": "HIV viral load",
+    "comorbidityGoals": "Comorbidity pharmacologic goals"
+  },
+  "missing": {
+    "pregnancy": "Pregnancy status not documented",
+    "ageBand": "Age band missing",
+    "comorbidities": "Comorbidity burden missing",
+    "polypharmacy": "Medication count missing",
+    "complexity": "Complexity index missing",
+    "adherenceArt": "ART adherence missing",
+    "adherenceConcomitant": "Concomitant adherence missing",
+    "hospitalization": "Recent hospitalization status missing",
+    "qualityOfLife": "Quality of life status missing",
+    "depression": "Depression status missing",
+    "substanceUse": "Substance use status missing",
+    "neurocognitive": "Neurocognitive status missing",
+    "frailty": "Frailty status missing",
+    "socioeconomic": "Socioeconomic status missing",
+    "viralLoad": "Viral load status missing",
+    "comorbidityGoals": "Comorbidity goals status missing"
+  },
+  "options": {
+    "no": "No",
+    "yes": "Yes",
+    "pregnancyYes": "Pregnant (automatic priority 1)",
+    "ageUnder50": "Under 50 years",
+    "ageOver50": "Over 50 years",
+    "ageOver65": "Over 65 years",
+    "under50": "Under 50 years",
+    "over50": "Over 50 years",
+    "over65": "Over 65 years",
+    "comorbLow": "Fewer than 2 relevant comorbidities",
+    "comorbHigh": "2 or more relevant comorbidities",
+    "low": "Low",
+    "high": "High",
+    "polyLow": "Fewer than 6 medications",
+    "polyHigh": "6 or more medications",
+    "complexityLow": "11.25 or lower",
+    "complexityHigh": "Above 11.25",
+    "adherenceGood": "Good adherence",
+    "adherenceSuboptimal": "Suboptimal adherence",
+    "good": "Good adherence",
+    "suboptimal": "Suboptimal adherence",
+    "hospitalNone": "No hospitalization in the last 6 months",
+    "hospitalRecent": "1 or more hospitalizations in the last 6 months",
+    "none": "None",
+    "recent": "Recent hospitalization",
+    "qualityNormal": "Unimpaired",
+    "qualityAffected": "Affected",
+    "normal": "Unimpaired",
+    "affected": "Affected",
+    "substanceYes": "Yes, alcohol or other substances",
+    "stable": "Stable",
+    "vulnerable": "Vulnerable",
+    "socioStable": "Stable socioeconomic context",
+    "socioVulnerable": "Unfavorable socioeconomic context",
+    "viralUndetectable": "Undetectable",
+    "viralDetectable": "Detectable",
+    "undetectable": "Undetectable",
+    "detectable": "Detectable",
+    "goalsAchieved": "Goals achieved",
+    "goalsNotAchieved": "Goals not achieved",
+    "achieved": "Goals achieved",
+    "notAchieved": "Goals not achieved"
+  },
+  "statuses": {
+    "confirmed": "Confirmed",
+    "extracted": "Extracted",
+    "inferred": "Inferred",
+    "missing": "Missing"
+  },
+  "priority": {
+    "priority1": "Priority 1 — High",
+    "priority2": "Priority 2 — Medium",
+    "priority3": "Priority 3 — Low",
+    "priority1Auto": "Priority 1 — Automatic"
+  },
+  "followup": {
+    "priority1": "Every 3 months / high-intensity follow-up",
+    "priority2": "Every 6 months / moderate-intensity follow-up",
+    "priority3": "Every 12 months / routine follow-up"
+  },
+  "interventions": {
+    "priority1": [
+      "Validate ART and comorbidity therapy immediately.",
+      "Perform adherence review with intensive reinforcement.",
+      "Coordinate multidisciplinary review for high-risk flags.",
+      "Assess digital, psychosocial, and frailty barriers during the same workflow."
+    ],
+    "priority2": [
+      "Review treatment effectiveness and tolerability.",
+      "Address adherence barriers and education needs.",
+      "Optimize comorbidity control with coordinated follow-up.",
+      "Monitor psychosocial changes and care access barriers."
+    ],
+    "priority3": [
+      "Maintain routine HIV pharmaceutical follow-up.",
+      "Reinforce self-management and adherence habits.",
+      "Reassess stratification when new risks appear."
+    ]
+  },
+  "riskFlags": {
+    "pregnancy": "Pregnancy-related prioritization",
+    "viralLoad": "Detectable viral load",
+    "artAdherence": "Suboptimal ART adherence",
+    "hospitalization": "Recent hospitalization",
+    "frailty": "Frailty present",
+    "neurocognitive": "Neurocognitive impairment"
+  },
+  "traceability": {
+    "title": "Traceability",
+    "timestamp": "Timestamp",
+    "version": "Version",
+    "inputSource": "Input source",
+    "modifications": "Clinician modifications",
+    "source": "Source",
+    "evidence": "Evidence",
+    "autosave": "Autosave"
+  },
+  "explainability": {
+    "title": "Explainability panel",
+    "empty": "Run the engine to display score contributions and rationale.",
+    "whyTitle": "Why this level?",
+    "contribTitle": "Variable contributions",
+    "missingTitle": "Missing data",
+    "totalScore": "Deterministic total score: {total}.",
+    "autoLevel": "Automatic classification based on explicit rules: {level}.",
+    "overrideApplied": "Clinician override applied. Final level set to {level}.",
+    "noOverride": "No clinician override is currently applied."
+  },
+  "ai": {
+    "title": "AI-assisted intake",
+    "instructions": "The AI module extracts structured variables from pasted text, labels each finding as extracted or inferred, and never fills undocumented values.",
+    "empty": "No AI-derived variables yet.",
+    "summaryDetected": "The text-processing module populated {count} structured variables while leaving unresolved variables as missing.",
+    "summaryNone": "No structured variables could be extracted confidently from the pasted text.",
+    "analysisComplete": "AI-assisted extraction completed. Human validation remains required."
+  },
+  "override": {
+    "title": "Clinician override",
+    "useOverride": "Enable clinician override",
+    "selectLevel": "Select final level",
+    "reason": "Clinical rationale for override",
+    "reasonPlaceholder": "Document why the deterministic result was adjusted.",
+    "auto": "Keep automatic classification"
+  },
+  "exports": {
+    "title": "Outputs and exports",
+    "ready": "Exports are ready. Use the buttons above to download structured deliverables.",
+    "pending": "Run the engine to enable outputs.",
+    "summaryTitle": "Clinical summary",
+    "totalScore": "Total score",
+    "followUp": "Follow-up",
+    "keyDrivers": "Key drivers",
+    "riskFlags": "Risk flags",
+    "source": "Input source",
+    "timestamp": "Timestamp"
+  },
+  "settings": {
+    "title": "Workflow settings",
+    "clinicianName": "Clinician name",
+    "clinicianNamePlaceholder": "Responsible clinician",
+    "centerName": "Center / service",
+    "centerNamePlaceholder": "Hospital or pharmacy service"
+  },
+  "legal": {
+    "clinicalDisclaimer": "Clinical decision support only — not a substitute for clinician judgment.",
+    "aiDisclaimer": "AI-assisted extraction may contain errors and requires human validation.",
+    "privacyDisclaimer": "Privacy-first design — no personal identifiers are required.",
+    "regulatoryDisclaimer": "Not a certified medical device; intended for research, support, and pilot use.",
+    "ipDisclaimer": "CMO-VIH Pro v2 — March 2026. All rights reserved. No reproduction without permission."
+  },
+  "footer": {
+    "description": "Designed for pilot-level HIV pharmaceutical care workflow support, explainable stratification, and scalable AI-assisted expansion."
+  }
+}
