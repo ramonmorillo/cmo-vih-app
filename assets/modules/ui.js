@@ -1,6 +1,5 @@
 import {
   APP_VERSION,
-  EXAMPLE_CASE,
   FIELD_DEFINITIONS,
   PRIORITY_CONFIG,
   SECTION_LABEL_KEYS,
@@ -9,6 +8,15 @@ import {
 import { t } from './i18n.js';
 import { renderFoundationSection } from './foundation-section.js';
 import { computeCompletion } from './data-layer.js';
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
 
 function stateBadge(status, translate) {
   const map = {
@@ -99,9 +107,11 @@ function renderTraceability(state, analysis) {
   return `
     <ul class="trace-list">
       <li><strong>${t('traceability.caseId')}:</strong> ${state.patientCase.caseId || t('common.none')}</li>
+      <li><strong>${t('savedCases.patientLabel')}:</strong> ${escapeHtml(state.patientCase.pseudonymizedPatientLabel || t('common.none'))}</li>
       <li><strong>${t('traceability.timestamp')}:</strong> ${traceability.timestamp || t('common.none')}</li>
       <li><strong>${t('traceability.version')}:</strong> ${APP_VERSION}</li>
       <li><strong>${t('traceability.inputSource')}:</strong> ${traceability.inputSource}</li>
+      <li><strong>${t('savedCases.storageLocation')}:</strong> ${t(`savedCases.storageMode.${state.savedCases.storageMode}`)}</li>
       <li><strong>${t('traceability.modifications')}:</strong> ${traceability.clinicianModifications}</li>
       <li><strong>${t('traceability.autosave')}:</strong> ${state.autosave.lastSavedAt || t('common.none')}</li>
     </ul>
@@ -165,6 +175,84 @@ function renderInterventions(analysis) {
   return `<ul class="bullet-list">${analysis.interventions.map((item) => `<li>${item}</li>`).join('')}</ul>`;
 }
 
+function renderSavedCasesList(state) {
+  const items = state.savedCases.filteredItems || [];
+
+  if (!items.length) {
+    return `<div class="empty-panel">${t('savedCases.empty')}</div>`;
+  }
+
+  return `
+    <div class="saved-cases-list">
+      ${items.map((item) => `
+        <article class="saved-case-card ${item.caseId === state.patientCase.caseId ? 'saved-case-card--active' : ''}">
+          <div class="saved-case-card__header">
+            <div>
+              <strong>${escapeHtml(item.pseudonymizedPatientLabel || t('savedCases.noLabel'))}</strong>
+              <p>${t('traceability.caseId')}: ${escapeHtml(item.caseId)}</p>
+            </div>
+            <span class="badge badge--confirmed">${escapeHtml(item.cmoLevel || t('common.none'))}</span>
+          </div>
+          <div class="saved-case-card__meta">
+            <span>${t('savedCases.score')}: ${item.calculatedScore ?? t('common.none')}</span>
+            <span>${t('savedCases.inputSource')}: ${escapeHtml(item.inputSource || t('common.none'))}</span>
+            <span>${t('savedCases.updatedAt')}: ${item.updatedAt ? new Date(item.updatedAt).toLocaleString(state.locale) : t('common.none')}</span>
+          </div>
+          <div class="saved-case-card__actions">
+            <button type="button" class="button-ghost" data-saved-case-action="open" data-case-id="${escapeHtml(item.caseId)}">${t('savedCases.open')}</button>
+            <button type="button" class="button-ghost" data-saved-case-action="duplicate" data-case-id="${escapeHtml(item.caseId)}">${t('savedCases.duplicate')}</button>
+            <button type="button" class="button-ghost" data-saved-case-action="export" data-case-id="${escapeHtml(item.caseId)}">${t('savedCases.exportJson')}</button>
+            <button type="button" class="button-ghost button-danger" data-saved-case-action="delete" data-case-id="${escapeHtml(item.caseId)}">${t('savedCases.delete')}</button>
+          </div>
+        </article>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderSavedCasesSection(state) {
+  const storageMessage = t('savedCases.helperStorage', { storage: t(`savedCases.storageMode.${state.savedCases.storageMode}`) });
+  const openAttr = state.ui.savedCasesOpen ? 'open' : '';
+
+  return `
+    <details class="section-card" id="savedCasesSection" ${openAttr}>
+      <summary>${t('savedCases.title')}</summary>
+      <div class="section-body">
+        <div class="saved-cases-toolbar">
+          <button id="saveCurrentCaseBtn">${t('savedCases.save')}</button>
+          <button id="saveAsNewCaseBtn" class="button-secondary">${t('savedCases.saveAsNew')}</button>
+          <button id="updateExistingCaseBtn" class="button-secondary">${t('savedCases.updateExisting')}</button>
+        </div>
+        <p class="supporting-text">${storageMessage}</p>
+        <p class="supporting-text">${t('savedCases.helperPrivacy')}</p>
+        ${state.savedCases.error ? `<div class="inline-alert">${escapeHtml(state.savedCases.error)}</div>` : ''}
+        <div class="saved-cases-filters">
+          <label>
+            ${t('savedCases.searchCaseId')}
+            <input id="savedCaseIdSearch" value="${escapeHtml(state.savedCases.filters.caseId)}" placeholder="${t('savedCases.searchCaseIdPlaceholder')}">
+          </label>
+          <label>
+            ${t('savedCases.searchPatientLabel')}
+            <input id="savedPatientSearch" value="${escapeHtml(state.savedCases.filters.patientLabel)}" placeholder="${t('savedCases.searchPatientLabelPlaceholder')}">
+          </label>
+          <label>
+            ${t('savedCases.sortBy')}
+            <select id="savedCasesSort">
+              <option value="updatedDesc" ${state.savedCases.filters.sortBy === 'updatedDesc' ? 'selected' : ''}>${t('savedCases.sort.updatedDesc')}</option>
+              <option value="updatedAsc" ${state.savedCases.filters.sortBy === 'updatedAsc' ? 'selected' : ''}>${t('savedCases.sort.updatedAsc')}</option>
+              <option value="createdDesc" ${state.savedCases.filters.sortBy === 'createdDesc' ? 'selected' : ''}>${t('savedCases.sort.createdDesc')}</option>
+              <option value="createdAsc" ${state.savedCases.filters.sortBy === 'createdAsc' ? 'selected' : ''}>${t('savedCases.sort.createdAsc')}</option>
+              <option value="patientLabelAsc" ${state.savedCases.filters.sortBy === 'patientLabelAsc' ? 'selected' : ''}>${t('savedCases.sort.patientLabelAsc')}</option>
+              <option value="patientLabelDesc" ${state.savedCases.filters.sortBy === 'patientLabelDesc' ? 'selected' : ''}>${t('savedCases.sort.patientLabelDesc')}</option>
+            </select>
+          </label>
+        </div>
+        ${renderSavedCasesList(state)}
+      </div>
+    </details>
+  `;
+}
+
 function renderNewCaseModal(state) {
   if (!state.ui?.modals?.newCase?.open) {
     return '';
@@ -205,10 +293,15 @@ export function renderApp(state) {
           <p class="hero__subtitle">${t('header.subtitle')}</p>
         </div>
         <div class="hero__actions">
-          <button id="newCaseBtn" class="button-primary button-with-icon">
-            <span class="button-icon" aria-hidden="true">＋</span>
-            <span>${t('buttons.newCase')}</span>
-          </button>
+          <div class="toolbar-grid">
+            <button id="newCaseBtn" class="button-primary button-with-icon">
+              <span class="button-icon" aria-hidden="true">＋</span>
+              <span>${t('buttons.newCase')}</span>
+            </button>
+            <button id="toolbarSaveBtn" class="button-secondary">${t('buttons.save')}</button>
+            <button id="toggleSavedCasesBtn" class="button-ghost">${t('buttons.savedCases')}</button>
+            <button id="toolbarExportBtn" class="button-ghost">${t('buttons.export')}</button>
+          </div>
           <label class="locale-switcher">
             <span>${t('header.language')}</span>
             <select id="localeSelect">
@@ -239,6 +332,7 @@ export function renderApp(state) {
           </div>
           <div class="dashboard-section__meta">
             <span class="case-pill">${t('traceability.caseId')}: ${state.patientCase.caseId}</span>
+            <span class="case-pill">${t('savedCases.patientLabel')}: ${escapeHtml(state.patientCase.pseudonymizedPatientLabel || t('savedCases.noLabel'))}</span>
             <span class="autosave-pill">${t('traceability.autosave')}: ${state.autosave.lastSavedAt ? new Date(state.autosave.lastSavedAt).toLocaleString(state.locale) : t('common.none')}</span>
           </div>
         </div>
@@ -257,7 +351,7 @@ export function renderApp(state) {
           <details class="section-card" open>
             <summary>${t('inputs.textSection')}</summary>
             <div class="section-body">
-              <textarea id="narrativeInput" placeholder="${t('inputs.textPlaceholder')}">${state.patientCase.narrative || ''}</textarea>
+              <textarea id="narrativeInput" placeholder="${t('inputs.textPlaceholder')}">${escapeHtml(state.patientCase.narrative || '')}</textarea>
               <div class="button-row">
                 <button id="analyzeTextBtn">${t('buttons.analyzeText')}</button>
                 <button id="loadExampleBtn" class="button-secondary">${t('buttons.loadExample')}</button>
@@ -273,7 +367,7 @@ export function renderApp(state) {
                 <option value="json" ${state.ui.importType === 'json' ? 'selected' : ''}>JSON</option>
                 <option value="csv" ${state.ui.importType === 'csv' ? 'selected' : ''}>CSV</option>
               </select>
-              <textarea id="importInput" placeholder="${t('inputs.importPlaceholder')}">${state.patientCase.importRaw || ''}</textarea>
+              <textarea id="importInput" placeholder="${t('inputs.importPlaceholder')}">${escapeHtml(state.patientCase.importRaw || '')}</textarea>
               <button id="importBtn" class="button-secondary">${t('buttons.import')}</button>
               <p class="supporting-text">${t('inputs.futureIntegration')}</p>
             </div>
@@ -321,6 +415,8 @@ export function renderApp(state) {
         </section>
 
         <section class="column-stack">
+          ${renderSavedCasesSection(state)}
+
           <details class="section-card" open>
             <summary>${t('override.title')}</summary>
             <div class="section-body">
@@ -336,7 +432,7 @@ export function renderApp(state) {
                 </select>
               </label>
               <label>${t('override.reason')}
-                <textarea id="overrideReason" placeholder="${t('override.reasonPlaceholder')}">${state.patientCase.override.reason || ''}</textarea>
+                <textarea id="overrideReason" placeholder="${t('override.reasonPlaceholder')}">${escapeHtml(state.patientCase.override.reason || '')}</textarea>
               </label>
               <button id="recalculateBtn">${t('buttons.recalculate')}</button>
             </div>
@@ -356,11 +452,15 @@ export function renderApp(state) {
           <details class="section-card" open>
             <summary>${t('settings.title')}</summary>
             <div class="section-body">
+              <label>${t('settings.patientLabel')}
+                <input id="patientLabel" value="${escapeHtml(state.patientCase.pseudonymizedPatientLabel || '')}" placeholder="${t('settings.patientLabelPlaceholder')}">
+              </label>
+              <p class="supporting-text">${t('settings.patientLabelHelp')}</p>
               <label>${t('settings.clinicianName')}
-                <input id="clinicianName" value="${state.patientCase.clinician.name || ''}" placeholder="${t('settings.clinicianNamePlaceholder')}">
+                <input id="clinicianName" value="${escapeHtml(state.patientCase.clinician.name || '')}" placeholder="${t('settings.clinicianNamePlaceholder')}">
               </label>
               <label>${t('settings.centerName')}
-                <input id="centerName" value="${state.patientCase.clinician.center || ''}" placeholder="${t('settings.centerNamePlaceholder')}">
+                <input id="centerName" value="${escapeHtml(state.patientCase.clinician.center || '')}" placeholder="${t('settings.centerNamePlaceholder')}">
               </label>
             </div>
           </details>
