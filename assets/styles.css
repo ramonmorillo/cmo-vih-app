@@ -221,6 +221,73 @@ details.section-card summary::-webkit-details-marker { display: none; }
 }
 
 
+/* Layout: clinical text intake centered at top */
+.text-intake-center {
+  display: flex;
+  justify-content: center;
+}
+.text-intake-center > .section-card {
+  width: 100%;
+  max-width: 760px;
+}
+
+/* Layout: summary panel full-width at bottom */
+.summary-panel-bottom > .section-card {
+  width: 100%;
+}
+.summary-panel-bottom .panel-grid--two {
+  padding: 18px 20px 20px;
+}
+
+/* Foundation section accordion */
+.foundation-accordion {
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid rgba(139, 30, 63, 0.08);
+  box-shadow: var(--shadow);
+}
+
+.foundation-accordion__toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  text-align: left;
+}
+.foundation-accordion__toggle:hover {
+  background: rgba(139, 30, 63, 0.04);
+  opacity: 1;
+}
+
+.foundation-accordion__chevron {
+  display: inline-block;
+  transition: transform 0.3s ease;
+  font-size: 0.85rem;
+  color: var(--primary);
+}
+.foundation-accordion.is-open .foundation-accordion__chevron {
+  transform: rotate(180deg);
+}
+
+.foundation-accordion__body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.35s ease;
+}
+.foundation-accordion.is-open .foundation-accordion__body {
+  max-height: 4000px;
+}
+
 .foundation-section {
   position: relative;
 }

@@ -340,24 +340,26 @@ export function renderApp(state) {
         ${renderDashboard(analysis)}
       </section>
 
+      <div class="text-intake-center">
+        <details class="section-card" open>
+          <summary>${t('inputs.textSection')}</summary>
+          <div class="section-body">
+            <textarea id="narrativeInput" placeholder="${t('inputs.textPlaceholder')}">${escapeHtml(state.patientCase.narrative || '')}</textarea>
+            <div class="button-row">
+              <button id="analyzeTextBtn">${t('buttons.analyzeText')}</button>
+              <button id="loadExampleBtn" class="button-secondary">${t('buttons.loadExample')}</button>
+            </div>
+            <p class="supporting-text">${t('ai.instructions')}</p>
+          </div>
+        </details>
+      </div>
+
       <main class="layout-grid">
         <section class="column-stack">
           <details class="section-card" open>
             <summary>${t('inputs.manualSection')}</summary>
             <div class="section-grid">
               ${SECTION_ORDER.map((sectionId) => renderSection(sectionId, state)).join('')}
-            </div>
-          </details>
-
-          <details class="section-card" open>
-            <summary>${t('inputs.textSection')}</summary>
-            <div class="section-body">
-              <textarea id="narrativeInput" placeholder="${t('inputs.textPlaceholder')}">${escapeHtml(state.patientCase.narrative || '')}</textarea>
-              <div class="button-row">
-                <button id="analyzeTextBtn">${t('buttons.analyzeText')}</button>
-                <button id="loadExampleBtn" class="button-secondary">${t('buttons.loadExample')}</button>
-              </div>
-              <p class="supporting-text">${t('ai.instructions')}</p>
             </div>
           </details>
 
@@ -376,28 +378,6 @@ export function renderApp(state) {
         </section>
 
         <section class="column-stack">
-          <details class="section-card" open>
-            <summary>${t('dashboard.summaryPanel')}</summary>
-            <div class="panel-grid panel-grid--two">
-              <article class="panel-card">
-                <h3>${t('dashboard.riskFlags')}</h3>
-                <ul>${analysis?.riskFlags?.map((item) => `<li>${item}</li>`).join('') || `<li>${t('common.none')}</li>`}</ul>
-              </article>
-              <article class="panel-card">
-                <h3>${t('dashboard.suggestedInterventions')}</h3>
-                ${renderInterventions(analysis)}
-              </article>
-              <article class="panel-card">
-                <h3>${t('dashboard.followUpIntensity')}</h3>
-                <p>${analysis?.followUp || t('common.none')}</p>
-              </article>
-              <article class="panel-card">
-                <h3>${t('traceability.title')}</h3>
-                ${renderTraceability(state, analysis)}
-              </article>
-            </div>
-          </details>
-
           <details class="section-card" open>
             <summary>${t('explainability.title')}</summary>
             ${renderExplainability(analysis)}
@@ -467,6 +447,30 @@ export function renderApp(state) {
           </details>
         </section>
       </main>
+
+      <div class="summary-panel-bottom">
+        <details class="section-card" open>
+          <summary>${t('dashboard.summaryPanel')}</summary>
+          <div class="panel-grid panel-grid--two">
+            <article class="panel-card">
+              <h3>${t('dashboard.riskFlags')}</h3>
+              <ul>${analysis?.riskFlags?.map((item) => `<li>${item}</li>`).join('') || `<li>${t('common.none')}</li>`}</ul>
+            </article>
+            <article class="panel-card">
+              <h3>${t('dashboard.suggestedInterventions')}</h3>
+              ${renderInterventions(analysis)}
+            </article>
+            <article class="panel-card">
+              <h3>${t('dashboard.followUpIntensity')}</h3>
+              <p>${analysis?.followUp || t('common.none')}</p>
+            </article>
+            <article class="panel-card">
+              <h3>${t('traceability.title')}</h3>
+              ${renderTraceability(state, analysis)}
+            </article>
+          </div>
+        </details>
+      </div>
 
       ${renderFoundationSection()}
       ${renderNewCaseModal(state)}

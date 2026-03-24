@@ -88,30 +88,48 @@ export function renderFoundationSection() {
 
   return `
     <section class="foundation-section" aria-label="${t('footer.sectionTitle')}">
-      <div class="foundation-shell">
-        <div class="foundation-hero">
-          <div>
-            <p class="eyebrow foundation-eyebrow">${t('footer.sectionEyebrow')}</p>
-            <h2>${t('footer.sectionTitle')}</h2>
-            <p class="foundation-intro">${t('footer.sectionIntro')}</p>
-          </div>
-          <div class="foundation-meta">
-            <div class="foundation-version">${APP_VERSION}</div>
-            <div class="foundation-tag-row">
-              ${renderTag(t('footer.tagSupport'))}
-              ${renderTag(t('footer.tagScientific'))}
-              ${renderTag(t('footer.tagBilingual'))}
+      <div class="foundation-accordion" id="foundationAccordion">
+        <button
+          class="foundation-accordion__toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="foundationAccordionBody"
+          onclick="
+            var acc = document.getElementById('foundationAccordion');
+            var open = acc.classList.toggle('is-open');
+            this.setAttribute('aria-expanded', open);
+          "
+        >
+          <span>${t('footer.sectionTitle')}</span>
+          <span class="foundation-accordion__chevron" aria-hidden="true">▼</span>
+        </button>
+        <div class="foundation-accordion__body" id="foundationAccordionBody">
+          <div class="foundation-shell">
+            <div class="foundation-hero">
+              <div>
+                <p class="eyebrow foundation-eyebrow">${t('footer.sectionEyebrow')}</p>
+                <h2>${t('footer.sectionTitle')}</h2>
+                <p class="foundation-intro">${t('footer.sectionIntro')}</p>
+              </div>
+              <div class="foundation-meta">
+                <div class="foundation-version">${APP_VERSION}</div>
+                <div class="foundation-tag-row">
+                  ${renderTag(t('footer.tagSupport'))}
+                  ${renderTag(t('footer.tagScientific'))}
+                  ${renderTag(t('footer.tagBilingual'))}
+                </div>
+              </div>
+            </div>
+
+            <div class="foundation-grid">
+              ${cards.map(renderCard).join('')}
+            </div>
+
+            <div class="foundation-bottom-bar">
+              <strong>${t('footer.bottomCreator')}</strong>
+              <span>${t('footer.bottomRights')}</span>
             </div>
           </div>
-        </div>
-
-        <div class="foundation-grid">
-          ${cards.map(renderCard).join('')}
-        </div>
-
-        <div class="foundation-bottom-bar">
-          <strong>${t('footer.bottomCreator')}</strong>
-          <span>${t('footer.bottomRights')}</span>
         </div>
       </div>
     </section>
