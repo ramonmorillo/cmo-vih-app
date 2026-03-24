@@ -16,7 +16,7 @@ export async function loadLocale(locale) {
   const response = await fetch(`data/i18n/${locale}.json`);
   dictionary = await response.json();
   currentLocale = locale;
-  document.documentElement.lang = locale === 'es' ? 'es' : 'en';
+  document.documentElement.lang = locale === 'es' ? 'es' : locale === 'pt' ? 'pt-BR' : 'en';
   return dictionary;
 }
 
