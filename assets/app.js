@@ -390,6 +390,11 @@ function bindEvents() {
     render();
   });
   document.querySelector('.saved-cases-list')?.addEventListener('click', handleSavedCaseAction);
+  document.getElementById('foundationToggleBtn')?.addEventListener('click', () => {
+    const accordion = document.getElementById('foundationAccordion');
+    const isOpen = accordion.classList.toggle('foundation-accordion--open');
+    document.getElementById('foundationToggleBtn').setAttribute('aria-expanded', String(isOpen));
+  });
 }
 
 async function init() {

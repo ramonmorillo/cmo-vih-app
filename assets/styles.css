@@ -402,6 +402,51 @@ details.section-card summary::-webkit-details-marker { display: none; }
   color: var(--text);
 }
 
+/* Foundation accordion (Change 3) */
+.foundation-accordion {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.foundation-accordion__toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 20px 28px;
+  background: var(--surface);
+  border: 1px solid rgba(139, 30, 63, 0.08);
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  text-align: left;
+}
+.foundation-accordion--open .foundation-accordion__toggle {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: var(--line);
+}
+.foundation-accordion__chevron {
+  display: inline-block;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.foundation-accordion--open .foundation-accordion__chevron {
+  transform: rotate(180deg);
+}
+.foundation-accordion__body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.foundation-accordion--open .foundation-accordion__body {
+  max-height: 4800px;
+}
+
 @media (max-width: 1200px) {
   .layout-grid { grid-template-columns: 1fr; }
 }

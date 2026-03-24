@@ -283,6 +283,7 @@ export function renderApp(state) {
   const completion = computeCompletion(state.patientCase.fields);
   const analysis = state.analysis;
 
+  const foundationOpen = document.getElementById('foundationAccordion')?.classList.contains('foundation-accordion--open') || false;
   document.title = `${APP_VERSION}`;
   document.getElementById('app').innerHTML = `
     <div class="app-shell">
@@ -325,20 +326,17 @@ export function renderApp(state) {
         </div>
       </section>
 
-      <section class="dashboard-section">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">${t('dashboard.eyebrow')}</p>
-            <h2>${t('dashboard.title')}</h2>
+      <details class="section-card text-intake-top" open>
+        <summary>${t('inputs.textSection')}</summary>
+        <div class="section-body">
+          <textarea id="narrativeInput" placeholder="${t('inputs.textPlaceholder')}">${escapeHtml(state.patientCase.narrative || '')}</textarea>
+          <div class="button-row">
+            <button id="analyzeTextBtn">${t('buttons.analyzeText')}</button>
+            <button id="loadExampleBtn" class="button-secondary">${t('buttons.loadExample')}</button>
           </div>
-          <div class="dashboard-section__meta">
-            <span class="case-pill">${t('traceability.caseId')}: ${state.patientCase.caseId}</span>
-            <span class="case-pill">${t('savedCases.patientLabel')}: ${escapeHtml(state.patientCase.pseudonymizedPatientLabel || t('savedCases.noLabel'))}</span>
-            <span class="autosave-pill">${t('traceability.autosave')}: ${state.autosave.lastSavedAt ? new Date(state.autosave.lastSavedAt).toLocaleString(state.locale) : t('common.none')}</span>
-          </div>
+          <p class="supporting-text">${t('ai.instructions')}</p>
         </div>
-        ${renderDashboard(analysis)}
-      </section>
+      </details>
 
       <main class="layout-grid">
         <section class="column-stack">
@@ -346,18 +344,6 @@ export function renderApp(state) {
             <summary>${t('inputs.manualSection')}</summary>
             <div class="section-grid">
               ${SECTION_ORDER.map((sectionId) => renderSection(sectionId, state)).join('')}
-            </div>
-          </details>
-
-          <details class="section-card" open>
-            <summary>${t('inputs.textSection')}</summary>
-            <div class="section-body">
-              <textarea id="narrativeInput" placeholder="${t('inputs.textPlaceholder')}">${escapeHtml(state.patientCase.narrative || '')}</textarea>
-              <div class="button-row">
-                <button id="analyzeTextBtn">${t('buttons.analyzeText')}</button>
-                <button id="loadExampleBtn" class="button-secondary">${t('buttons.loadExample')}</button>
-              </div>
-              <p class="supporting-text">${t('ai.instructions')}</p>
             </div>
           </details>
 
@@ -468,7 +454,30 @@ export function renderApp(state) {
         </section>
       </main>
 
-      ${renderFoundationSection()}
+      <section class="dashboard-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">${t('dashboard.eyebrow')}</p>
+            <h2>${t('dashboard.title')}</h2>
+          </div>
+          <div class="dashboard-section__meta">
+            <span class="case-pill">${t('traceability.caseId')}: ${state.patientCase.caseId}</span>
+            <span class="case-pill">${t('savedCases.patientLabel')}: ${escapeHtml(state.patientCase.pseudonymizedPatientLabel || t('savedCases.noLabel'))}</span>
+            <span class="autosave-pill">${t('traceability.autosave')}: ${state.autosave.lastSavedAt ? new Date(state.autosave.lastSavedAt).toLocaleString(state.locale) : t('common.none')}</span>
+          </div>
+        </div>
+        ${renderDashboard(analysis)}
+      </section>
+
+      <div class="foundation-accordion${foundationOpen ? ' foundation-accordion--open' : ''}" id="foundationAccordion">
+        <button class="foundation-accordion__toggle" id="foundationToggleBtn" aria-expanded="${foundationOpen}">
+          <span>${t('footer.sectionTitle')}</span>
+          <span class="foundation-accordion__chevron" aria-hidden="true">▼</span>
+        </button>
+        <div class="foundation-accordion__body">
+          ${renderFoundationSection()}
+        </div>
+      </div>
       ${renderNewCaseModal(state)}
     </div>
   `;
