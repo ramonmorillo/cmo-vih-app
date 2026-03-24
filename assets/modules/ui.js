@@ -305,8 +305,9 @@ export function renderApp(state) {
           <label class="locale-switcher">
             <span>${t('header.language')}</span>
             <select id="localeSelect">
-              <option value="en" ${state.locale === 'en' ? 'selected' : ''}>English</option>
               <option value="es" ${state.locale === 'es' ? 'selected' : ''}>Español</option>
+              <option value="en" ${state.locale === 'en' ? 'selected' : ''}>English</option>
+              <option value="pt" ${state.locale === 'pt' ? 'selected' : ''}>Português</option>
             </select>
           </label>
           <div class="version-pill">${APP_VERSION}</div>
