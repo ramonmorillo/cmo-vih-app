@@ -3,8 +3,20 @@ const FIELD_PATTERNS = {
     { regex: /pregnan|embaraz/i, value: 'yes', status: 'extracted', evidence: null }
   ],
   ageBand: [
+    // FIX 2: allow optional hyphen between number and "year" (e.g. "52-year-old")
     {
-      regex: /(\d{2})\s*(?:years|años)/i,
+      regex: /(\d{2,3})\s*[-–]?\s*(?:year(?:s|-old)?|años)/i,
+      resolver: (match) => {
+        const age = Number(match[1]);
+        if (age > 65) return { value: 'over65', evidence: String(age) };
+        if (age > 50) return { value: 'over50', evidence: String(age) };
+        return { value: 'under50', evidence: String(age) };
+      },
+      status: 'extracted'
+    },
+    // FIX 2: second pattern for Spanish "de 52 años" format
+    {
+      regex: /de\s+(\d{2,3})\s+años/i,
       resolver: (match) => {
         const age = Number(match[1]);
         if (age > 65) return { value: 'over65', evidence: String(age) };
@@ -16,14 +28,23 @@ const FIELD_PATTERNS = {
   ],
   comorbidities: [
     {
-      regex: /(diabetes|hypertension|dyslipidemia|cardiovascular|renal|liver|hepatitis)/gi,
-      aggregate: (matches) => matches.length >= 2 ? { value: 'high', evidence: matches.join('; ') } : null,
+      // FIX 4: added Spanish terms: hipertensión, dislipemia, hepatopatía, insuficiencia renal, obesidad, EPOC
+      regex: /(diabetes|hypertension|dyslipidemia|cardiovascular|renal|liver|hepatitis|hipertensión|hipertension|dislipemia|hepatopatía|hepatopatia|insuficiencia\s+renal|obesidad|EPOC)/gi,
+      // FIX 4: 1 match → low (was null), 2+ matches → high
+      aggregate: (matches) => {
+        if (matches.length >= 2) return { value: 'high', evidence: matches.join('; ') };
+        if (matches.length === 1) return { value: 'low', evidence: matches[0] };
+        return null;
+      },
       status: 'inferred'
     }
   ],
   polypharmacy: [
+    // FIX 3: "polimedicado" alone implies high polypharmacy
+    { regex: /polimedicado/i, value: 'high', status: 'inferred', evidence: null },
     {
-      regex: /(\d+)\s+(?:total\s+)?medications?/i,
+      // FIX 3: added Spanish variants: medicamentos, fármacos, principios activos
+      regex: /(\d+)\s+(?:total\s+)?(?:medications?|medicamentos?|fármacos?|farmacos?|principios\s+activos)/i,
       resolver: (match) => Number(match[1]) >= 6 ? { value: 'high', evidence: match[0] } : { value: 'low', evidence: match[0] },
       status: 'extracted'
     }
@@ -36,13 +57,18 @@ const FIELD_PATTERNS = {
     }
   ],
   adherenceArt: [
-    { regex: /(missed doses|suboptimal ART adherence|olvidos.*TAR|poor adherence)/i, value: 'suboptimal', status: 'inferred', evidence: null }
+    // FIX 6: added Spanish variants for poor ART adherence
+    { regex: /(missed doses|suboptimal ART adherence|olvidos.*TAR|poor adherence|olvida\s+tomas|no\s+toma\s+correctamente|mal\s+cumplimiento|incumplimiento\s+TAR|adherencia\s+sub[oó]ptima)/i, value: 'suboptimal', status: 'inferred', evidence: null }
   ],
   adherenceConcomitant: [
-    { regex: /(concomitant adherence issue|difficulty taking other medication|medicación concomitante.*adherencia)/i, value: 'suboptimal', status: 'inferred', evidence: null }
+    // FIX 6: added Spanish variants for concomitant adherence issues
+    { regex: /(concomitant adherence issue|difficulty taking other medication|medicaci[oó]n concomitante.*adherencia|adherencia.*medicaci[oó]n concomitante)/i, value: 'suboptimal', status: 'inferred', evidence: null }
   ],
   hospitalization: [
-    { regex: /(hospitalization|hospitalisation|hospitalización|admission).*(6 months|6 meses)?/i, value: 'recent', status: 'extracted', evidence: null }
+    // FIX 5: added "hospitalizado" and "ingreso hospitalario"; time reference optional (either order)
+    { regex: /(hospitalization|hospitalisation|hospitalización|hospitalizado|ingreso\s+hospitalario|admission).*(6\s*months?|6\s*meses)?/i, value: 'recent', status: 'extracted', evidence: null },
+    // FIX 5: second pattern with time reference appearing BEFORE the hospitalization term
+    { regex: /(6\s*months?|6\s*meses).*(hospitali[zs]ation|hospitalización|hospitalizado|admission|ingreso)/i, value: 'recent', status: 'extracted', evidence: null }
   ],
   qualityOfLife: [
     { regex: /(fatigue|quality of life affected|calidad de vida afectada|functional limitation)/i, value: 'affected', status: 'inferred', evidence: null }
@@ -63,8 +89,11 @@ const FIELD_PATTERNS = {
     { regex: /(lives alone|homeless|housing insecurity|vive solo|social isolation|pension)/i, value: 'vulnerable', status: 'inferred', evidence: null }
   ],
   viralLoad: [
-    { regex: /(viral load).*?(detectable)/i, value: 'detectable', status: 'extracted', evidence: null },
-    { regex: /(viral load).*?(undetectable|indetectable)/i, value: 'undetectable', status: 'extracted', evidence: null }
+    // FIX 1: undetectable/indetectable evaluated FIRST to prevent substring false positive
+    // Also added "carga viral" for Spanish notes
+    { regex: /(viral load|carga viral).*?(undetectable|indetectable)/i, value: 'undetectable', status: 'extracted', evidence: null },
+    // FIX 1: \b word boundary ensures "undetectable" does not match this pattern
+    { regex: /(viral load|carga viral).*?\b(detectable)\b/i, value: 'detectable', status: 'extracted', evidence: null }
   ],
   comorbidityGoals: [
     { regex: /(HbA1c\s*[>:=]?\s*8|blood pressure\s*145\/90|goals remain unmet|objetivos.*no alcanzados)/i, value: 'notAchieved', status: 'inferred', evidence: null }
