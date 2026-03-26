@@ -1,5 +1,5 @@
 import { APP_VERSION, EXAMPLE_CASE, FIELD_DEFINITIONS } from './modules/config.js';
-import { extractFromNarrative } from './modules/ai-module.js';
+import { extractFromNarrative, extractFromNarrativeAI } from './modules/ai-module.js';
 import { evaluateCase } from './modules/cmo-engine.js';
 import {
   applyImportedRecord,
@@ -40,6 +40,12 @@ import {
 } from './modules/export-layer.js';
 import { loadLocale, t } from './modules/i18n.js';
 import { renderApp } from './modules/ui.js';
+
+const ANTHROPIC_KEY_STORAGE = 'cmo-vih-anthropic-key';
+
+function getApiKey() {
+  return localStorage.getItem(ANTHROPIC_KEY_STORAGE) || '';
+}
 
 let state = createDefaultState();
 
@@ -107,16 +113,29 @@ function handleNarrativeInputForDraft(event) {
   state = saveState(state);
 }
 
-function handleAnalyzeText() {
+async function handleAnalyzeText() {
   const narrative = document.getElementById('narrativeInput').value.trim();
-  state = updateNarrative(state, narrative, 'text');
-  const extraction = extractFromNarrative(narrative, state.patientCase.fields, t);
-  state.patientCase.notes = extraction.explanation;
-  Object.entries(extraction.updates).forEach(([fieldId, payload]) => {
-    state = updateField(state, fieldId, payload);
-  });
-  persistAndRender();
-  window.alert(`${t('ai.analysisComplete')}\n${extraction.explanation}`);
+  const btn = document.getElementById('analyzeTextBtn');
+  const originalText = btn ? btn.textContent : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = t('ai.analyzingWithAI');
+  }
+  try {
+    state = updateNarrative(state, narrative, 'text');
+    const extraction = await extractFromNarrativeAI(narrative, state.patientCase.fields, FIELD_DEFINITIONS, getApiKey(), t);
+    state.patientCase.notes = extraction.explanation;
+    Object.entries(extraction.updates).forEach(([fieldId, payload]) => {
+      state = updateField(state, fieldId, payload);
+    });
+    persistAndRender();
+    window.alert(`${t('ai.analysisComplete')}\n${extraction.explanation}`);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  }
 }
 
 function handleLoadExample() {
@@ -343,7 +362,17 @@ function bindEvents() {
   document.getElementById('narrativeInput')?.addEventListener('change', handleNarrativeChange);
   document.getElementById('narrativeInput')?.addEventListener('input', handleNarrativeInputForDraft);
   document.getElementById('patientLabel')?.addEventListener('change', handlePatientLabelChange);
-  document.getElementById('analyzeTextBtn')?.addEventListener('click', handleAnalyzeText);
+  document.getElementById('analyzeTextBtn')?.addEventListener('click', () => {
+    handleAnalyzeText().catch((error) => console.error('Analysis error:', error));
+  });
+  document.getElementById('anthropicApiKeyInput')?.addEventListener('change', (event) => {
+    const key = event.target.value.trim();
+    if (key) {
+      localStorage.setItem(ANTHROPIC_KEY_STORAGE, key);
+    } else {
+      localStorage.removeItem(ANTHROPIC_KEY_STORAGE);
+    }
+  });
   document.getElementById('loadExampleBtn')?.addEventListener('click', handleLoadExample);
   document.getElementById('importBtn')?.addEventListener('click', handleImport);
   document.getElementById('importType')?.addEventListener('change', handleImportTypeChange);

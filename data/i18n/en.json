@@ -215,7 +215,12 @@
     "empty": "No AI-derived variables yet.",
     "summaryDetected": "The text-processing module populated {count} structured variables while leaving unresolved variables as missing.",
     "summaryNone": "No structured variables could be extracted confidently from the pasted text.",
-    "analysisComplete": "AI-assisted extraction completed. Human validation remains required."
+    "analysisComplete": "AI-assisted extraction completed. Human validation remains required.",
+    "analyzingWithAI": "Analyzing with AI...",
+    "apiKeyLabel": "Anthropic API Key (optional)",
+    "apiKeyHint": "Stored in your browser. Improves extraction from free-text clinical notes.",
+    "apiFallback": "AI extraction failed. Regex-only result.",
+    "summaryAI": "{{regex}} fields by patterns + {{ai}} fields by AI — confirm before stratifying."
   },
   "override": {
     "title": "Clinician override",

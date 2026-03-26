@@ -123,6 +123,41 @@ function runPattern(fieldId, text) {
   return null;
 }
 
+const AI_EXTRACTION_PROMPT = (narrativeText) => `You are a clinical pharmacist extracting structured data from an HIV patient's \
+clinical note to stratify pharmaceutical care complexity.
+
+Extract ONLY the following fields. For each field, return ONLY one of its valid \
+values. If a field cannot be determined from the text, return null.
+
+Fields to extract (id: valid values):
+- ageBand: "under50" | "over50" | "over65"
+- comorbidities: "low" (1 comorbidity) | "high" (2 or more comorbidities)
+- polypharmacy: "low" (fewer than 6 drugs) | "high" (6 or more drugs) — COUNT all drugs listed, including antiretroviral therapy
+- complexity: "low" | "high" (high if complexity index > 11.25, or if polypharmacy is high AND multiple comorbidities)
+- adherenceArt: "good" | "suboptimal"
+- adherenceConcomitant: "good" | "suboptimal"
+- hospitalization: "none" | "recent" (hospitalized in the past 6 months — calculate from dates if present)
+- qualityOfLife: "normal" | "affected"
+- depression: "no" | "yes"
+- substanceUse: "no" | "yes" — IMPORTANT: only "yes" if ACTIVE use is confirmed; "No alcohol" means "no"
+- neurocognitive: "no" | "yes"
+- frailty: "no" | "yes"
+- socioeconomic: "stable" | "vulnerable" (vulnerable if: lives alone, social problems, housing issues, poverty, food insecurity)
+- viralLoad: "undetectable" | "detectable" — accept "ARN VIH indetectable", "CV indetectable", "carga viral indetectable" as undetectable
+- comorbidityGoals: "achieved" | "notAchieved"
+- pregnancy: "no" | "yes"
+
+Clinical note:
+${narrativeText}
+
+Respond with ONLY a valid JSON object. No explanation, no markdown. Example:
+{"ageBand": "over50", "comorbidities": "high", "polypharmacy": "high", \
+ "viralLoad": "undetectable", "hospitalization": "recent", "substanceUse": "no",
+ "socioeconomic": "vulnerable", "adherenceArt": "good", "depression": "no",
+ "frailty": "no", "neurocognitive": "no", "qualityOfLife": "normal",
+ "comorbidityGoals": "achieved", "complexity": "low", "pregnancy": "no",
+ "adherenceConcomitant": "good"}`;
+
 export function extractFromNarrative(text, fields, translate) {
   const updates = {};
   const missing = [];
@@ -159,4 +194,73 @@ export function extractFromNarrative(text, fields, translate) {
     missing,
     explanation
   };
+}
+
+export async function extractFromNarrativeAI(narrative, fields, fieldDefinitions, apiKey, translate) {
+  // Step 1: run regex extraction first
+  const regexResult = extractFromNarrative(narrative, fields, translate);
+
+  // Step 2: nothing missing or no key — return regex result as-is
+  if (!regexResult.missing.length || !apiKey) {
+    return regexResult;
+  }
+
+  // Step 3: call Anthropic API for remaining missing fields
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: AI_EXTRACTION_PROMPT(narrative) }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API ${response.status}`);
+    }
+
+    const data = await response.json();
+    const aiFields = JSON.parse(data.content[0].text);
+
+    // Step 4: merge AI results — only fill fields that were missing after regex
+    const updates = { ...regexResult.updates };
+    const extractionSummary = [...regexResult.extractionSummary];
+    const missing = [];
+    let aiCount = 0;
+    const AI_EVIDENCE = 'Extraído por IA — requiere confirmación clínica';
+
+    for (const fieldId of regexResult.missing) {
+      const aiValue = aiFields[fieldId];
+      if (aiValue !== null && aiValue !== undefined) {
+        updates[fieldId] = {
+          value: aiValue,
+          status: 'inferred',
+          source: 'ai',
+          evidence: AI_EVIDENCE,
+          clinicianConfirmed: false
+        };
+        extractionSummary.push({ fieldId, value: aiValue, status: 'inferred', evidence: AI_EVIDENCE });
+        aiCount++;
+      } else {
+        missing.push(fieldId);
+      }
+    }
+
+    const regexCount = regexResult.extractionSummary.length;
+    const explanation = translate('ai.summaryAI', { regex: regexCount, ai: aiCount });
+
+    return { updates, extractionSummary, missing, explanation };
+  } catch {
+    // Step 5: fall back to regex-only result with warning
+    return {
+      ...regexResult,
+      explanation: `${translate('ai.apiFallback')} ${regexResult.explanation || ''}`.trim()
+    };
+  }
 }

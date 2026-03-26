@@ -349,6 +349,16 @@ export function renderApp(state) {
               <button id="analyzeTextBtn">${t('buttons.analyzeText')}</button>
               <button id="loadExampleBtn" class="button-secondary">${t('buttons.loadExample')}</button>
             </div>
+            <details class="api-key-section">
+              <summary class="supporting-text">${t('ai.apiKeyLabel')}</summary>
+              <div class="api-key-body">
+                <input type="password" id="anthropicApiKeyInput"
+                  value="${escapeHtml(localStorage.getItem('cmo-vih-anthropic-key') || '')}"
+                  placeholder="sk-ant-... (opcional, mejora extracción)"
+                  autocomplete="off">
+                <p class="supporting-text">${t('ai.apiKeyHint')}</p>
+              </div>
+            </details>
             <p class="supporting-text">${t('ai.instructions')}</p>
           </div>
         </details>

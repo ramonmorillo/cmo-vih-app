@@ -215,7 +215,12 @@
     "empty": "Todavía no hay variables derivadas por IA.",
     "summaryDetected": "El módulo de procesamiento de texto completó {count} variables estructuradas y dejó como ausentes las no resueltas.",
     "summaryNone": "No se pudieron extraer variables estructuradas con suficiente confianza del texto pegado.",
-    "analysisComplete": "Extracción asistida por IA completada. Sigue siendo obligatoria la validación humana."
+    "analysisComplete": "Extracción asistida por IA completada. Sigue siendo obligatoria la validación humana.",
+    "analyzingWithAI": "Analizando con IA...",
+    "apiKeyLabel": "Clave API Anthropic (opcional)",
+    "apiKeyHint": "Se guarda en tu navegador. Mejora la extracción de HCs en texto libre.",
+    "apiFallback": "La extracción IA falló. Resultado solo con patrones.",
+    "summaryAI": "{{regex}} campos por patrones + {{ai}} campos por IA — confirma antes de estratificar."
   },
   "override": {
     "title": "Modificación del clínico",
