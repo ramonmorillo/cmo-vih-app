@@ -1,0 +1,102 @@
+/* CMO Suite · capa visual común basada en CMO Migraña */
+:root {
+  --cmo-accent: #e86b94;
+  --cmo-accent-dark: #751b43;
+  --cmo-accent-soft: #fde8ef;
+  --cmo-bg-a: #3d102a;
+  --cmo-bg-b: #18284d;
+  --cmo-focus: #ffbf47;
+  --cmo-panel: #f8fbff;
+  --cmo-line: #d8e2f0;
+  --cmo-ink: #172033;
+  --cmo-muted: #5b6880;
+  --cmo-radius: 28px;
+  --cmo-shadow: 0 24px 70px #02081740;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  min-height: 100vh;
+  background: radial-gradient(
+    circle at 15% 8%,
+    var(--cmo-bg-a) 0,
+    #111b34 36%,
+    var(--cmo-bg-b) 100%
+  ) !important;
+  color: var(--cmo-ink);
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(#ffffff08 1px, transparent 1px),
+    linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+}
+#app,
+.app-shell {
+  position: relative;
+}
+.hero {
+  border: 1px solid #ffffff2b !important;
+  border-radius: var(--cmo-radius) !important;
+  box-shadow: var(--cmo-shadow) !important;
+  background: linear-gradient(135deg, #5f1538, #8b1e4b 55%, #263d72) !important;
+}
+.hero h1 {
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+  margin: 0.35rem 0;
+  color: #fff;
+}
+:where(
+  .progress-card,
+  .section-card,
+  .dashboard-section,
+  .foundation-shell,
+  .foundation-accordion,
+  .metric-card,
+  .panel-card,
+  .field-card,
+  .ai-item,
+  .modal-card
+) {
+  border-radius: 22px !important;
+  border-color: var(--cmo-line) !important;
+  box-shadow: 0 16px 42px #0208171c !important;
+}
+.metric-card--accent {
+  background: linear-gradient(
+    135deg,
+    var(--cmo-accent-dark),
+    #253f78
+  ) !important;
+}
+button {
+  border-radius: 999px !important;
+}
+input,
+select,
+textarea {
+  border-radius: 13px !important;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 4px solid var(--cmo-focus) !important;
+  outline-offset: 2px;
+}
+.progress-bar span {
+  background: linear-gradient(90deg, var(--cmo-accent), #7595e8) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
