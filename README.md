@@ -1,6 +1,6 @@
-# CMO-VIH Pro v2 — March 2026
+# CMO-VIH Pro v3 — September 2026
 
-CMO-VIH Pro v2 is a static, bilingual, semi-clinical decision-support web app designed for HIV pharmaceutical care workflows at pilot level.
+CMO-VIH Pro v3 is a static, bilingual, semi-clinical decision-support web app designed for HIV pharmaceutical care workflows at pilot level.
 
 ## What changed in v2
 - Rebuilt the app from a single-file calculator into a modular static architecture.

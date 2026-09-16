@@ -65,10 +65,15 @@ const FIELD_PATTERNS = {
     { regex: /(concomitant adherence issue|difficulty taking other medication|medicaci[oó]n concomitante.*adherencia|adherencia.*medicaci[oó]n concomitante)/i, value: 'suboptimal', status: 'inferred', evidence: null }
   ],
   hospitalization: [
-    // FIX 5: added "hospitalizado" and "ingreso hospitalario"; time reference optional (either order)
-    { regex: /(hospitalization|hospitalisation|hospitalización|hospitalizado|ingreso\s+hospitalario|admission).*(6\s*months?|6\s*meses)?/i, value: 'recent', status: 'extracted', evidence: null },
-    // FIX 5: second pattern with time reference appearing BEFORE the hospitalization term
-    { regex: /(6\s*months?|6\s*meses).*(hospitali[zs]ation|hospitalización|hospitalizado|admission|ingreso)/i, value: 'recent', status: 'extracted', evidence: null }
+    // FIX 5 (v2): added "hospitalizado" and "ingreso hospitalario", time reference either order.
+    // FIX 7 (v3): recency marker is now REQUIRED (was optional via trailing "?"), which previously
+    // classified ANY mention of hospitalization as 'recent' regardless of timeframe. Window bounded
+    // to 40 chars so the recency marker must be close to the hospitalization mention.
+    { regex: /(hospitalization|hospitalisation|hospitalización|hospitalizado|ingreso\s+hospitalario|admission).{0,40}(6\s*months?|6\s*meses|recent|reciente)/i, value: 'recent', status: 'extracted', evidence: null },
+    // FIX 5 (v2): second pattern with time reference appearing BEFORE the hospitalization term.
+    // FIX 7 (v3): also accept "recent"/"reciente" as a leading marker (covers "recent hospitalization",
+    // where the adjective precedes the noun — pattern above only matches the reverse order).
+    { regex: /(6\s*months?|6\s*meses|recent|reciente).{0,40}(hospitali[zs]ation|hospitalización|hospitalizado|admission|ingreso)/i, value: 'recent', status: 'extracted', evidence: null }
   ],
   qualityOfLife: [
     { regex: /(fatigue|quality of life affected|calidad de vida afectada|functional limitation)/i, value: 'affected', status: 'inferred', evidence: null }
@@ -96,15 +101,55 @@ const FIELD_PATTERNS = {
     { regex: /(viral load|carga viral).*?\b(detectable)\b/i, value: 'detectable', status: 'extracted', evidence: null }
   ],
   comorbidityGoals: [
-    { regex: /(HbA1c\s*[>:=]?\s*8|blood pressure\s*145\/90|goals remain unmet|objetivos.*no alcanzados)/i, value: 'notAchieved', status: 'inferred', evidence: null }
+    // Left untouched per explicit decision (out of scope for this iteration): hardcoded thresholds
+    // (HbA1c ~8, BP 145/90) are known to be overfit to EXAMPLE_CASE and not generalized — see
+    // audit notes. skipNegation keeps this pattern's matching behavior unchanged.
+    { regex: /(HbA1c\s*[>:=]?\s*8|blood pressure\s*145\/90|goals remain unmet|objetivos.*no alcanzados)/i, value: 'notAchieved', status: 'inferred', evidence: null, skipNegation: true }
   ]
 };
+
+// FIX 7 (v3): minimal negation heuristic (English + Spanish cues). Not a full clinical NLP
+// negation detector (e.g. NegEx) — it only looks back to the start of the current clause
+// (bounded by ".", ";" or a newline) for a negation trigger word.
+// Known limitation: only text BEFORE the match start is inspected. A negation word that falls
+// INSIDE a wildcard-spanned match (e.g. "viral load is *not* detectable", where the regex's
+// `.*?` between "viral load" and "detectable" swallows "not") is not caught. Expanding the
+// window to the full match span was tried and reverted: some patterns intentionally embed "no"
+// as part of the positive clinical assertion itself (e.g. adherenceArt's "no toma correctamente"
+// literally means poor adherence), so a span-wide scan produces false suppressions there.
+const NEGATION_TRIGGERS = /\b(no|not|without|denies?|denied|negative(?:\s+for)?|rules?\s+out|ruled\s+out|absence\s+of|sin|niega|niego|neg[oó]|ausencia\s+de|ausente|descart(?:a|ada|ado))\b/i;
+
+function isNegated(text, matchIndex) {
+  if (typeof matchIndex !== 'number') return false;
+  const preceding = text.slice(0, matchIndex);
+  const clauseStart = Math.max(
+    preceding.lastIndexOf('.'),
+    preceding.lastIndexOf(';'),
+    preceding.lastIndexOf('\n')
+  );
+  const clause = text.slice(clauseStart + 1, matchIndex);
+  return NEGATION_TRIGGERS.test(clause);
+}
+
+function toGlobalRegex(regex) {
+  return regex.global ? regex : new RegExp(regex.source, `${regex.flags}g`);
+}
+
+function firstNonNegatedMatch(regex, text) {
+  for (const match of text.matchAll(toGlobalRegex(regex))) {
+    if (!isNegated(text, match.index)) return match;
+  }
+  return null;
+}
 
 function runPattern(fieldId, text) {
   const patterns = FIELD_PATTERNS[fieldId] || [];
   for (const pattern of patterns) {
     if (pattern.aggregate) {
-      const matches = [...text.matchAll(pattern.regex)].map((item) => item[0]);
+      // FIX 7 (v3): drop individually negated mentions before counting/aggregating.
+      const matches = [...text.matchAll(toGlobalRegex(pattern.regex))]
+        .filter((item) => !isNegated(text, item.index))
+        .map((item) => item[0]);
       const aggregateResult = pattern.aggregate(matches);
       if (aggregateResult) {
         return { ...aggregateResult, status: pattern.status };
@@ -112,12 +157,17 @@ function runPattern(fieldId, text) {
       continue;
     }
 
-    const match = text.match(pattern.regex);
-    if (!match) continue;
     if (pattern.resolver) {
+      // Numeric/derived patterns (age, medication count, complexity index) are not negation-checked:
+      // they extract a captured value rather than assert a binary clinical finding.
+      const match = text.match(pattern.regex);
+      if (!match) continue;
       const resolved = pattern.resolver(match);
       return { ...resolved, status: pattern.status };
     }
+
+    const match = pattern.skipNegation ? text.match(pattern.regex) : firstNonNegatedMatch(pattern.regex, text);
+    if (!match) continue;
     return { value: pattern.value, status: pattern.status, evidence: pattern.evidence || match[0] };
   }
   return null;

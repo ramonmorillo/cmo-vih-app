@@ -41,7 +41,7 @@
 
 ## Copyright Strings (not translated, copied exactly)
 
-- `legal.ipDisclaimer`: `"CMO-VIH Pro v2 — March 2026. All rights reserved. No reproduction without permission."`
+- `legal.ipDisclaimer`: `"CMO-VIH Pro v3 — September 2026. All rights reserved. No reproduction without permission."`
 - `footer.ipNotice`: `"© 2026 Ramón Morillo-Verdugo"`
 - `footer.scientificReferenceTitle`: copied exactly as in en.json
 - `footer.scientificReferenceMeta`: copied exactly as in en.json

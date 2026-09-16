@@ -252,17 +252,17 @@
     "aiDisclaimer": "A extração assistida por IA pode conter erros e requer validação humana.",
     "privacyDisclaimer": "Projeto com foco em privacidade — nenhum identificador pessoal é necessário.",
     "regulatoryDisclaimer": "Não é um dispositivo médico certificado; destinado a pesquisa, suporte e uso piloto.",
-    "ipDisclaimer": "CMO-VIH Pro v2 — March 2026. All rights reserved. No reproduction without permission."
+    "ipDisclaimer": "CMO-VIH Pro v3 — September 2026. All rights reserved. No reproduction without permission."
   },
   "footer": {
     "sectionEyebrow": "Sobre, aspectos legais e base científica",
     "sectionTitle": "Base científica e estrutura de uso clínico",
-    "sectionIntro": "CMO-VIH Pro v2 apresenta uma camada final estruturada para posicionamento científico, enquadramento legal prudente e autoria visível em uma interface clínica contemporânea.",
+    "sectionIntro": "CMO-VIH Pro v3 apresenta uma camada final estruturada para posicionamento científico, enquadramento legal prudente e autoria visível em uma interface clínica contemporânea.",
     "tagSupport": "Suporte clínico",
     "tagScientific": "Base científica",
     "tagBilingual": "Multilíngue",
     "aboutTitle": "Sobre a ferramenta",
-    "aboutBody": "CMO-VIH Pro v2 — March 2026 é um sistema digital de apoio à estratificação farmacêutica em pessoas vivendo com HIV, baseado no modelo CMO (Capacidade, Motivação e Oportunidade) e projetado para suporte piloto, pesquisa aplicada e evolução escalável com IA.",
+    "aboutBody": "CMO-VIH Pro v3 — September 2026 é um sistema digital de apoio à estratificação farmacêutica em pessoas vivendo com HIV, baseado no modelo CMO (Capacidade, Motivação e Oportunidade) e projetado para suporte piloto, pesquisa aplicada e evolução escalável com IA.",
     "scientificTitle": "Base científica",
     "scientificBody": "Esta ferramenta digital está fundamentada no modelo CMO de cuidado farmacêutico e em evidências clínicas publicadas sobre seu impacto em pessoas vivendo com HIV. Baseia-se no trabalho de Ramón Morillo-Verdugo e colaboradores e reflete um modelo com impacto clínico documentado nessa população.",
     "scientificReferenceLabel": "Publicação de referência",

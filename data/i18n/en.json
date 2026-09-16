@@ -252,17 +252,17 @@
     "aiDisclaimer": "AI-assisted extraction may contain errors and requires human validation.",
     "privacyDisclaimer": "Privacy-first design — no personal identifiers are required.",
     "regulatoryDisclaimer": "Not a certified medical device; intended for research, support, and pilot use.",
-    "ipDisclaimer": "CMO-VIH Pro v2 — March 2026. All rights reserved. No reproduction without permission."
+    "ipDisclaimer": "CMO-VIH Pro v3 — September 2026. All rights reserved. No reproduction without permission."
   },
   "footer": {
     "sectionEyebrow": "About, legal, and scientific framework",
     "sectionTitle": "Scientific foundation and clinical use framework",
-    "sectionIntro": "CMO-VIH Pro v2 is presented as a structured end layer for scientific positioning, prudent legal framing, and visible authorship within a modern clinical workflow interface.",
+    "sectionIntro": "CMO-VIH Pro v3 is presented as a structured end layer for scientific positioning, prudent legal framing, and visible authorship within a modern clinical workflow interface.",
     "tagSupport": "Clinical support",
     "tagScientific": "Scientific basis",
     "tagBilingual": "Bilingual-ready",
     "aboutTitle": "About the tool",
-    "aboutBody": "CMO-VIH Pro v2 — March 2026 is a digital support system for pharmaceutical stratification in people living with HIV, based on the CMO model (Capacity, Motivation, and Opportunity) and designed for pilot support, applied research, and scalable AI-enabled evolution.",
+    "aboutBody": "CMO-VIH Pro v3 — September 2026 is a digital support system for pharmaceutical stratification in people living with HIV, based on the CMO model (Capacity, Motivation, and Opportunity) and designed for pilot support, applied research, and scalable AI-enabled evolution.",
     "scientificTitle": "Scientific basis",
     "scientificBody": "This digital tool is grounded in the CMO pharmaceutical care model and in published clinical evidence on its impact in people living with HIV. It builds on the work of Ramón Morillo-Verdugo and collaborators and reflects a model with documented clinical impact in this population.",
     "scientificReferenceLabel": "Foundational publication",

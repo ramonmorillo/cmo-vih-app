@@ -1,0 +1,10 @@
+{
+  "name": "cmo-vih-pro",
+  "private": true,
+  "version": "3.0.0",
+  "description": "CMO-VIH Pro v3 — September 2026. Static, bilingual HIV pharmaceutical care decision-support tool.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

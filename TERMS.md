@@ -1,7 +1,7 @@
 # TERMS.md
 
 ## Acceptance
-By using CMO-VIH Pro v2 — March 2026, users agree that the tool is provided for clinical support, research, and pilot workflow use only.
+By using CMO-VIH Pro v3 — September 2026, users agree that the tool is provided for clinical support, research, and pilot workflow use only.
 
 ## Prohibited assumptions
 Users must not represent the application as:
