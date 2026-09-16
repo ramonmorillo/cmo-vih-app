@@ -1,7 +1,7 @@
 # LEGAL_NOTICE.md
 
 ## Product identity
-**CMO-VIH Pro v2 — March 2026**
+**CMO-VIH Pro v3 — September 2026**
 
 ## Intended purpose
 This software is intended as a semi-clinical decision-support tool for HIV pharmaceutical care, stratification support, pilot workflows, and research-oriented operational use.
@@ -19,4 +19,4 @@ This software is **not** a certified medical device and does not claim regulator
 The tool is provided for support, research, and pilot deployment contexts. Users are responsible for validating all outputs and ensuring compliance with local policies, procedures, and professional obligations.
 
 ## Intellectual property
-CMO-VIH Pro v2 — March 2026. All rights reserved. No reproduction, redistribution, or derivative commercial use without permission.
+CMO-VIH Pro v3 — September 2026. All rights reserved. No reproduction, redistribution, or derivative commercial use without permission.

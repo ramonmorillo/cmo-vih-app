@@ -252,17 +252,17 @@
     "aiDisclaimer": "La extracción asistida por IA puede contener errores y requiere validación humana.",
     "privacyDisclaimer": "Diseño centrado en la privacidad; no requiere identificadores personales.",
     "regulatoryDisclaimer": "No es un producto sanitario certificado; destinado a investigación, soporte y uso piloto.",
-    "ipDisclaimer": "CMO-VIH Pro v2 — March 2026. Todos los derechos reservados. Prohibida su reproducción sin permiso."
+    "ipDisclaimer": "CMO-VIH Pro v3 — Septiembre 2026. Todos los derechos reservados. Prohibida su reproducción sin permiso."
   },
   "footer": {
     "sectionEyebrow": "Marco científico, legal y de autoría",
     "sectionTitle": "Base científica y marco de uso clínico",
-    "sectionIntro": "CMO-VIH Pro v2 incorpora una capa final estructurada para posicionamiento científico, protección legal prudente y autoría visible dentro de una interfaz clínica contemporánea.",
+    "sectionIntro": "CMO-VIH Pro v3 incorpora una capa final estructurada para posicionamiento científico, protección legal prudente y autoría visible dentro de una interfaz clínica contemporánea.",
     "tagSupport": "Soporte clínico",
     "tagScientific": "Base científica",
     "tagBilingual": "Preparado para bilingüe",
     "aboutTitle": "Sobre la herramienta",
-    "aboutBody": "CMO-VIH Pro v2 — March 2026 es un sistema digital de apoyo a la estratificación farmacéutica en personas con VIH, basado en el modelo CMO (Capacidad, Motivación y Oportunidad) y diseñado para soporte piloto, investigación aplicada y evolución escalable con IA.",
+    "aboutBody": "CMO-VIH Pro v3 — Septiembre 2026 es un sistema digital de apoyo a la estratificación farmacéutica en personas con VIH, basado en el modelo CMO (Capacidad, Motivación y Oportunidad) y diseñado para soporte piloto, investigación aplicada y evolución escalable con IA.",
     "scientificTitle": "Base científica",
     "scientificBody": "Esta herramienta digital se fundamenta en el modelo CMO de atención farmacéutica y en evidencia clínica publicada sobre su impacto en personas con VIH. Se apoya en el trabajo de Ramón Morillo-Verdugo y colaboradores y refleja un modelo con impacto clínico documentado en esta población.",
     "scientificReferenceLabel": "Publicación de referencia",

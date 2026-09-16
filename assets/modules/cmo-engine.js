@@ -85,7 +85,7 @@ export function evaluateCase(patientCase, translate) {
     explainability,
     traceability: {
       timestamp: new Date().toISOString(),
-      version: patientCase.version || 'CMO-VIH Pro v2 — March 2026',
+      version: patientCase.version || 'CMO-VIH Pro v3 — September 2026',
       inputSource: patientCase.source,
       clinicianModifications: patientCase.traceability.modifications.filter((item) => item.type === 'field-update' || item.type === 'override-update').length
     }

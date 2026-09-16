@@ -1,7 +1,7 @@
 # VERSION.md
 
 ## Current version
-**CMO-VIH Pro v2 — March 2026**
+**CMO-VIH Pro v3 — September 2026**
 
 ## Version summary
-This version introduces a modular static architecture, bilingual support, explicit scoring logic, explainability, clinician override, AI-assisted text intake, imports, structured exports, traceability, and governance documentation.
+This version hardens the AI-assisted free-text extraction module: negation detection to reduce false positives, a stricter recency check for the hospitalization pattern, and a minimal automated test suite for the extraction logic. No other module, workflow, or CMO scoring logic was modified.
