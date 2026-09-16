@@ -4,6 +4,28 @@
     "subtitle": "Ferramenta de suporte ao cuidado farmacêutico do HIV, com foco em privacidade, estratificação explicável e ingestão assistida por IA.",
     "language": "Idioma"
   },
+  "wizard": {
+    "stageIntro": "Início",
+    "stageNarrative": "Texto clínico",
+    "stageReview": "Revisão",
+    "stageStratify": "Estratificação",
+    "stageSavedCases": "Casos salvos",
+    "stageReport": "Relatório",
+    "introEyebrow": "Nova estratificação",
+    "introTitle": "Como deseja iniciar este caso?",
+    "introLead": "Escolha como começar. Em qualquer caminho, você poderá revisar e editar cada variável manualmente antes de calcular a classificação.",
+    "routeManualTitle": "Estratificação manual",
+    "routeManualBody": "Preencha cada variável CMO-VIH diretamente a partir de informação clínica confirmada.",
+    "routeManualCta": "Iniciar entrada manual",
+    "routeAiTitle": "Análise assistida de texto",
+    "routeAiBody": "Cole texto clínico anonimizado, revise cada achado extraído e complete o que ficar pendente.",
+    "routeAiCta": "Analisar texto clínico",
+    "continueToReview": "Continuar para a revisão de variáveis",
+    "continueToStratify": "Continuar para a estratificação",
+    "continueToSavedCases": "Continuar para os casos salvos",
+    "continueToReport": "Continuar para o relatório",
+    "skipToReview": "Pular e ir para a revisão de variáveis"
+  },
   "common": {
     "none": "Nenhum",
     "selectPlaceholder": "Selecione uma opção",

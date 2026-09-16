@@ -15,6 +15,8 @@ import {
   setNewCaseModal,
   setOverride,
   setSavedCases,
+  setWizardMode,
+  setWizardStage,
   updateClinician,
   updateField,
   updateNarrative,
@@ -92,6 +94,17 @@ function handleManualChange(event) {
   persistAndRender();
 }
 
+function goToStage(stageId) {
+  state = setWizardStage(state, stageId);
+  state = saveState(state);
+  render();
+}
+
+function chooseMode(mode) {
+  state = setWizardMode(state, mode);
+  goToStage(mode === 'manual' ? 'review' : 'narrative');
+}
+
 function handleNarrativeChange(event) {
   state = updateNarrative(state, event.target.value, 'text');
   persistAndRender();
@@ -115,6 +128,7 @@ function handleAnalyzeText() {
   Object.entries(extraction.updates).forEach(([fieldId, payload]) => {
     state = updateField(state, fieldId, payload);
   });
+  state = setWizardStage(state, 'review');
   persistAndRender();
   window.alert(`${t('ai.analysisComplete')}\n${extraction.explanation}`);
 }
@@ -284,6 +298,8 @@ async function handleSavedCaseAction(event) {
       await loadLocale(record.language);
     }
     state = hydrateStateFromSavedCase(state, record);
+    state = setWizardMode(state, record.inputSource === 'text' ? 'ai' : 'manual');
+    state = setWizardStage(state, 'stratify');
     recomputeAnalysis();
     state = markCaseClean(state);
     state = saveState(state);
@@ -384,12 +400,18 @@ function bindEvents() {
     state = updateUi(state, { savedCasesOpen: event.target.open });
     state = saveState(state);
   });
-  document.getElementById('toggleSavedCasesBtn')?.addEventListener('click', () => {
-    state = updateUi(state, { savedCasesOpen: !state.ui.savedCasesOpen });
-    state = saveState(state);
-    render();
-  });
+  document.getElementById('toggleSavedCasesBtn')?.addEventListener('click', () => goToStage('savedCases'));
   document.querySelector('.saved-cases-list')?.addEventListener('click', handleSavedCaseAction);
+
+  document.getElementById('manualRouteBtn')?.addEventListener('click', () => chooseMode('manual'));
+  document.getElementById('assistedRouteBtn')?.addEventListener('click', () => chooseMode('ai'));
+  document.getElementById('skipToReviewBtn')?.addEventListener('click', () => goToStage('review'));
+  document.getElementById('continueToStratifyBtn')?.addEventListener('click', () => goToStage('stratify'));
+  document.getElementById('continueToSavedCasesBtn')?.addEventListener('click', () => goToStage('savedCases'));
+  document.getElementById('continueToReportBtn')?.addEventListener('click', () => goToStage('report'));
+  document.querySelectorAll('.wizard-step:not(:disabled)').forEach((element) =>
+    element.addEventListener('click', () => goToStage(element.dataset.stage))
+  );
 }
 
 async function init() {

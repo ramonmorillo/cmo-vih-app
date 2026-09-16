@@ -210,6 +210,260 @@ function renderSavedCasesList(state) {
   `;
 }
 
+const STAGE_FLOWS = {
+  manual: ['intro', 'review', 'stratify', 'savedCases', 'report'],
+  ai: ['intro', 'narrative', 'review', 'stratify', 'savedCases', 'report']
+};
+
+const STAGE_LABEL_KEYS = {
+  intro: 'wizard.stageIntro',
+  narrative: 'wizard.stageNarrative',
+  review: 'wizard.stageReview',
+  stratify: 'wizard.stageStratify',
+  savedCases: 'wizard.stageSavedCases',
+  report: 'wizard.stageReport'
+};
+
+function activeStageFlow(wizard) {
+  return STAGE_FLOWS[wizard.mode] || STAGE_FLOWS.ai;
+}
+
+function renderWizardNav(wizard) {
+  const flow = activeStageFlow(wizard);
+  return `
+    <nav class="wizard-nav" aria-label="${t('wizard.stageIntro')}">
+      ${flow.map((stageId, index) => {
+        const unlocked = wizard.unlockedStages.includes(stageId);
+        const active = wizard.stage === stageId;
+        return `<button type="button" class="wizard-step ${active ? 'is-active' : ''}" data-stage="${stageId}" ${unlocked ? '' : 'disabled'}>${index + 1}. ${t(STAGE_LABEL_KEYS[stageId])}</button>`;
+      }).join('')}
+    </nav>
+  `;
+}
+
+function renderIntroStage(state) {
+  return `
+    <details class="section-card" open>
+      <summary>${t('wizard.introTitle')}</summary>
+      <div class="section-body">
+        <p class="eyebrow">${t('wizard.introEyebrow')}</p>
+        <p class="supporting-text">${t('wizard.introLead')}</p>
+        <div class="route-grid">
+          <article class="route-card">
+            <span class="route-icon" aria-hidden="true">✍️</span>
+            <h3>${t('wizard.routeManualTitle')}</h3>
+            <p>${t('wizard.routeManualBody')}</p>
+            <button type="button" id="manualRouteBtn" class="button-primary">${t('wizard.routeManualCta')}</button>
+          </article>
+          <article class="route-card">
+            <span class="route-icon" aria-hidden="true">✨</span>
+            <h3>${t('wizard.routeAiTitle')}</h3>
+            <p>${t('wizard.routeAiBody')}</p>
+            <button type="button" id="assistedRouteBtn" class="button-secondary">${t('wizard.routeAiCta')}</button>
+          </article>
+        </div>
+      </div>
+    </details>
+    <details class="section-card" open>
+      <summary>${t('settings.title')}</summary>
+      <div class="section-body">
+        <label>${t('settings.patientLabel')}
+          <input id="patientLabel" value="${escapeHtml(state.patientCase.pseudonymizedPatientLabel || '')}" placeholder="${t('settings.patientLabelPlaceholder')}">
+        </label>
+        <p class="supporting-text">${t('settings.patientLabelHelp')}</p>
+        <label>${t('settings.clinicianName')}
+          <input id="clinicianName" value="${escapeHtml(state.patientCase.clinician.name || '')}" placeholder="${t('settings.clinicianNamePlaceholder')}">
+        </label>
+        <label>${t('settings.centerName')}
+          <input id="centerName" value="${escapeHtml(state.patientCase.clinician.center || '')}" placeholder="${t('settings.centerNamePlaceholder')}">
+        </label>
+      </div>
+    </details>
+  `;
+}
+
+function renderNarrativeStage(state) {
+  return `
+    <div class="text-intake-center">
+      <details class="section-card" open>
+        <summary>${t('inputs.textSection')}</summary>
+        <div class="section-body">
+          <textarea id="narrativeInput" placeholder="${t('inputs.textPlaceholder')}">${escapeHtml(state.patientCase.narrative || '')}</textarea>
+          <div class="button-row">
+            <button id="analyzeTextBtn">${t('buttons.analyzeText')}</button>
+            <button id="loadExampleBtn" class="button-secondary">${t('buttons.loadExample')}</button>
+          </div>
+          <p class="supporting-text">${t('ai.instructions')}</p>
+          <button type="button" id="skipToReviewBtn" class="button-ghost">${t('wizard.skipToReview')}</button>
+        </div>
+      </details>
+    </div>
+  `;
+}
+
+function renderReviewStage(state) {
+  return `
+    <div class="layout-grid">
+      <section class="column-stack">
+        <details class="section-card" open>
+          <summary>${t('inputs.manualSection')}</summary>
+          <div class="section-grid">
+            ${SECTION_ORDER.map((sectionId) => renderSection(sectionId, state)).join('')}
+          </div>
+        </details>
+
+        <details class="section-card" open>
+          <summary>${t('inputs.importSection')}</summary>
+          <div class="section-body">
+            <select id="importType">
+              <option value="json" ${state.ui.importType === 'json' ? 'selected' : ''}>JSON</option>
+              <option value="csv" ${state.ui.importType === 'csv' ? 'selected' : ''}>CSV</option>
+            </select>
+            <textarea id="importInput" placeholder="${t('inputs.importPlaceholder')}">${escapeHtml(state.patientCase.importRaw || '')}</textarea>
+            <button id="importBtn" class="button-secondary">${t('buttons.import')}</button>
+            <p class="supporting-text">${t('inputs.futureIntegration')}</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="column-stack">
+        <details class="section-card" open>
+          <summary>${t('ai.title')}</summary>
+          <div class="panel-card">
+            <p>${t('ai.instructions')}</p>
+            <p class="supporting-text">${state.patientCase.notes || t('ai.empty')}</p>
+            <div class="ai-grid">
+              ${renderAiPanel(state)}
+            </div>
+          </div>
+        </details>
+      </section>
+    </div>
+    <div class="button-row button-row--wrap">
+      <button type="button" id="continueToStratifyBtn">${t('wizard.continueToStratify')}</button>
+    </div>
+  `;
+}
+
+function renderStratifyStage(state, analysis) {
+  return `
+    <section class="dashboard-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">${t('dashboard.eyebrow')}</p>
+          <h2>${t('dashboard.title')}</h2>
+        </div>
+        <div class="dashboard-section__meta">
+          <span class="case-pill">${t('traceability.caseId')}: ${state.patientCase.caseId}</span>
+          <span class="case-pill">${t('savedCases.patientLabel')}: ${escapeHtml(state.patientCase.pseudonymizedPatientLabel || t('savedCases.noLabel'))}</span>
+          <span class="autosave-pill">${t('traceability.autosave')}: ${state.autosave.lastSavedAt ? new Date(state.autosave.lastSavedAt).toLocaleString(state.locale) : t('common.none')}</span>
+        </div>
+      </div>
+      ${renderDashboard(analysis)}
+    </section>
+
+    <div class="layout-grid">
+      <section class="column-stack">
+        <details class="section-card" open>
+          <summary>${t('explainability.title')}</summary>
+          ${renderExplainability(analysis)}
+        </details>
+      </section>
+      <section class="column-stack">
+        <details class="section-card" open>
+          <summary>${t('override.title')}</summary>
+          <div class="section-body">
+            <label>${t('override.useOverride')}
+              <input type="checkbox" id="overrideEnabled" ${state.patientCase.override.enabled ? 'checked' : ''}>
+            </label>
+            <label>${t('override.selectLevel')}
+              <select id="overrideLevel">
+                <option value="auto" ${state.patientCase.override.level === 'auto' ? 'selected' : ''}>${t('override.auto')}</option>
+                <option value="1" ${String(state.patientCase.override.level) === '1' ? 'selected' : ''}>${t(PRIORITY_CONFIG[1].labelKey)}</option>
+                <option value="2" ${String(state.patientCase.override.level) === '2' ? 'selected' : ''}>${t(PRIORITY_CONFIG[2].labelKey)}</option>
+                <option value="3" ${String(state.patientCase.override.level) === '3' ? 'selected' : ''}>${t(PRIORITY_CONFIG[3].labelKey)}</option>
+              </select>
+            </label>
+            <label>${t('override.reason')}
+              <textarea id="overrideReason" placeholder="${t('override.reasonPlaceholder')}">${escapeHtml(state.patientCase.override.reason || '')}</textarea>
+            </label>
+            <button id="recalculateBtn">${t('buttons.recalculate')}</button>
+          </div>
+        </details>
+      </section>
+    </div>
+    <div class="button-row button-row--wrap">
+      <button type="button" id="continueToSavedCasesBtn">${t('wizard.continueToSavedCases')}</button>
+    </div>
+  `;
+}
+
+function renderSavedCasesStage(state) {
+  return `
+    ${renderSavedCasesSection(state)}
+    <div class="button-row button-row--wrap">
+      <button type="button" id="continueToReportBtn">${t('wizard.continueToReport')}</button>
+    </div>
+  `;
+}
+
+function renderReportStage(state, analysis) {
+  return `
+    <details class="section-card" open>
+      <summary>${t('exports.title')}</summary>
+      <div class="button-row button-row--wrap">
+        <button id="summaryExportBtn">${t('buttons.exportSummary')}</button>
+        <button id="jsonExportBtn" class="button-secondary">${t('buttons.exportJson')}</button>
+        <button id="csvExportBtn" class="button-secondary">${t('buttons.exportCsv')}</button>
+        <button id="printBtn" class="button-secondary">${t('buttons.print')}</button>
+      </div>
+      <pre class="report-box">${analysis ? `${t('exports.summaryTitle')}: ${analysis.priorityLabel}\n${t('exports.totalScore')}: ${analysis.total}\n${t('exports.followUp')}: ${analysis.followUp}\n${t('exports.riskFlags')}: ${analysis.riskFlags.join(', ') || t('common.none')}` : t('exports.pending')}</pre>
+    </details>
+
+    <div class="summary-panel-bottom">
+      <details class="section-card" open>
+        <summary>${t('dashboard.summaryPanel')}</summary>
+        <div class="panel-grid panel-grid--two">
+          <article class="panel-card">
+            <h3>${t('dashboard.riskFlags')}</h3>
+            <ul>${analysis?.riskFlags?.map((item) => `<li>${item}</li>`).join('') || `<li>${t('common.none')}</li>`}</ul>
+          </article>
+          <article class="panel-card">
+            <h3>${t('dashboard.suggestedInterventions')}</h3>
+            ${renderInterventions(analysis)}
+          </article>
+          <article class="panel-card">
+            <h3>${t('dashboard.followUpIntensity')}</h3>
+            <p>${analysis?.followUp || t('common.none')}</p>
+          </article>
+          <article class="panel-card">
+            <h3>${t('traceability.title')}</h3>
+            ${renderTraceability(state, analysis)}
+          </article>
+        </div>
+      </details>
+    </div>
+  `;
+}
+
+function renderStage(wizard, state, analysis) {
+  switch (wizard.stage) {
+    case 'narrative':
+      return renderNarrativeStage(state);
+    case 'review':
+      return renderReviewStage(state);
+    case 'stratify':
+      return renderStratifyStage(state, analysis);
+    case 'savedCases':
+      return renderSavedCasesStage(state);
+    case 'report':
+      return renderReportStage(state, analysis);
+    case 'intro':
+    default:
+      return renderIntroStage(state);
+  }
+}
+
 function renderSavedCasesSection(state) {
   const storageMessage = t('savedCases.helperStorage', { storage: t(`savedCases.storageMode.${state.savedCases.storageMode}`) });
   const openAttr = state.ui.savedCasesOpen ? 'open' : '';
@@ -282,6 +536,7 @@ function renderNewCaseModal(state) {
 export function renderApp(state) {
   const completion = computeCompletion(state.patientCase.fields);
   const analysis = state.analysis;
+  const wizard = state.ui.wizard || { mode: null, stage: 'intro', unlockedStages: ['intro'] };
 
   document.title = `${APP_VERSION}`;
   document.getElementById('app').innerHTML = `
@@ -330,152 +585,11 @@ export function renderApp(state) {
         </div>
       </section>
 
-      <section class="dashboard-section">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">${t('dashboard.eyebrow')}</p>
-            <h2>${t('dashboard.title')}</h2>
-          </div>
-          <div class="dashboard-section__meta">
-            <span class="case-pill">${t('traceability.caseId')}: ${state.patientCase.caseId}</span>
-            <span class="case-pill">${t('savedCases.patientLabel')}: ${escapeHtml(state.patientCase.pseudonymizedPatientLabel || t('savedCases.noLabel'))}</span>
-            <span class="autosave-pill">${t('traceability.autosave')}: ${state.autosave.lastSavedAt ? new Date(state.autosave.lastSavedAt).toLocaleString(state.locale) : t('common.none')}</span>
-          </div>
-        </div>
-        ${renderDashboard(analysis)}
-      </section>
+      ${renderWizardNav(wizard)}
 
-      <div class="text-intake-center">
-        <details class="section-card" open>
-          <summary>${t('inputs.textSection')}</summary>
-          <div class="section-body">
-            <textarea id="narrativeInput" placeholder="${t('inputs.textPlaceholder')}">${escapeHtml(state.patientCase.narrative || '')}</textarea>
-            <div class="button-row">
-              <button id="analyzeTextBtn">${t('buttons.analyzeText')}</button>
-              <button id="loadExampleBtn" class="button-secondary">${t('buttons.loadExample')}</button>
-            </div>
-            <p class="supporting-text">${t('ai.instructions')}</p>
-          </div>
-        </details>
-      </div>
-
-      <main class="layout-grid">
-        <section class="column-stack">
-          <details class="section-card" open>
-            <summary>${t('inputs.manualSection')}</summary>
-            <div class="section-grid">
-              ${SECTION_ORDER.map((sectionId) => renderSection(sectionId, state)).join('')}
-            </div>
-          </details>
-
-          <details class="section-card" open>
-            <summary>${t('inputs.importSection')}</summary>
-            <div class="section-body">
-              <select id="importType">
-                <option value="json" ${state.ui.importType === 'json' ? 'selected' : ''}>JSON</option>
-                <option value="csv" ${state.ui.importType === 'csv' ? 'selected' : ''}>CSV</option>
-              </select>
-              <textarea id="importInput" placeholder="${t('inputs.importPlaceholder')}">${escapeHtml(state.patientCase.importRaw || '')}</textarea>
-              <button id="importBtn" class="button-secondary">${t('buttons.import')}</button>
-              <p class="supporting-text">${t('inputs.futureIntegration')}</p>
-            </div>
-          </details>
-        </section>
-
-        <section class="column-stack">
-          <details class="section-card" open>
-            <summary>${t('explainability.title')}</summary>
-            ${renderExplainability(analysis)}
-          </details>
-
-          <details class="section-card" open>
-            <summary>${t('ai.title')}</summary>
-            <div class="panel-card">
-              <p>${t('ai.instructions')}</p>
-              <p class="supporting-text">${state.patientCase.notes || t('ai.empty')}</p>
-              <div class="ai-grid">
-                ${renderAiPanel(state)}
-              </div>
-            </div>
-          </details>
-        </section>
-
-        <section class="column-stack">
-          ${renderSavedCasesSection(state)}
-
-          <details class="section-card" open>
-            <summary>${t('override.title')}</summary>
-            <div class="section-body">
-              <label>${t('override.useOverride')}
-                <input type="checkbox" id="overrideEnabled" ${state.patientCase.override.enabled ? 'checked' : ''}>
-              </label>
-              <label>${t('override.selectLevel')}
-                <select id="overrideLevel">
-                  <option value="auto" ${state.patientCase.override.level === 'auto' ? 'selected' : ''}>${t('override.auto')}</option>
-                  <option value="1" ${String(state.patientCase.override.level) === '1' ? 'selected' : ''}>${t(PRIORITY_CONFIG[1].labelKey)}</option>
-                  <option value="2" ${String(state.patientCase.override.level) === '2' ? 'selected' : ''}>${t(PRIORITY_CONFIG[2].labelKey)}</option>
-                  <option value="3" ${String(state.patientCase.override.level) === '3' ? 'selected' : ''}>${t(PRIORITY_CONFIG[3].labelKey)}</option>
-                </select>
-              </label>
-              <label>${t('override.reason')}
-                <textarea id="overrideReason" placeholder="${t('override.reasonPlaceholder')}">${escapeHtml(state.patientCase.override.reason || '')}</textarea>
-              </label>
-              <button id="recalculateBtn">${t('buttons.recalculate')}</button>
-            </div>
-          </details>
-
-          <details class="section-card" open>
-            <summary>${t('exports.title')}</summary>
-            <div class="button-row button-row--wrap">
-              <button id="summaryExportBtn">${t('buttons.exportSummary')}</button>
-              <button id="jsonExportBtn" class="button-secondary">${t('buttons.exportJson')}</button>
-              <button id="csvExportBtn" class="button-secondary">${t('buttons.exportCsv')}</button>
-              <button id="printBtn" class="button-secondary">${t('buttons.print')}</button>
-            </div>
-            <pre class="report-box">${analysis ? `${t('exports.summaryTitle')}: ${analysis.priorityLabel}\n${t('exports.totalScore')}: ${analysis.total}\n${t('exports.followUp')}: ${analysis.followUp}\n${t('exports.riskFlags')}: ${analysis.riskFlags.join(', ') || t('common.none')}` : t('exports.pending')}</pre>
-          </details>
-
-          <details class="section-card" open>
-            <summary>${t('settings.title')}</summary>
-            <div class="section-body">
-              <label>${t('settings.patientLabel')}
-                <input id="patientLabel" value="${escapeHtml(state.patientCase.pseudonymizedPatientLabel || '')}" placeholder="${t('settings.patientLabelPlaceholder')}">
-              </label>
-              <p class="supporting-text">${t('settings.patientLabelHelp')}</p>
-              <label>${t('settings.clinicianName')}
-                <input id="clinicianName" value="${escapeHtml(state.patientCase.clinician.name || '')}" placeholder="${t('settings.clinicianNamePlaceholder')}">
-              </label>
-              <label>${t('settings.centerName')}
-                <input id="centerName" value="${escapeHtml(state.patientCase.clinician.center || '')}" placeholder="${t('settings.centerNamePlaceholder')}">
-              </label>
-            </div>
-          </details>
-        </section>
+      <main class="wizard-stage">
+        ${renderStage(wizard, state, analysis)}
       </main>
-
-      <div class="summary-panel-bottom">
-        <details class="section-card" open>
-          <summary>${t('dashboard.summaryPanel')}</summary>
-          <div class="panel-grid panel-grid--two">
-            <article class="panel-card">
-              <h3>${t('dashboard.riskFlags')}</h3>
-              <ul>${analysis?.riskFlags?.map((item) => `<li>${item}</li>`).join('') || `<li>${t('common.none')}</li>`}</ul>
-            </article>
-            <article class="panel-card">
-              <h3>${t('dashboard.suggestedInterventions')}</h3>
-              ${renderInterventions(analysis)}
-            </article>
-            <article class="panel-card">
-              <h3>${t('dashboard.followUpIntensity')}</h3>
-              <p>${analysis?.followUp || t('common.none')}</p>
-            </article>
-            <article class="panel-card">
-              <h3>${t('traceability.title')}</h3>
-              ${renderTraceability(state, analysis)}
-            </article>
-          </div>
-        </details>
-      </div>
 
       ${renderFoundationSection()}
       ${renderNewCaseModal(state)}
