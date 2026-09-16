@@ -39,6 +39,7 @@
     "import": "Importar datos",
     "recalculate": "Recalcular estratificación",
     "exportSummary": "Resumen clínico",
+    "copyRecord": "Copiar para historia clínica",
     "exportJson": "JSON de investigación",
     "exportCsv": "CSV de investigación",
     "print": "Informe imprimible",
@@ -257,7 +258,9 @@
     "keyDrivers": "Factores clave",
     "riskFlags": "Alertas de riesgo",
     "source": "Fuente de entrada",
-    "timestamp": "Marca temporal"
+    "timestamp": "Marca temporal",
+    "copySuccess": "Informe copiado al portapapeles. Ya puede pegarlo en la historia clínica.",
+    "copyError": "No se pudo copiar el informe automáticamente. Selecciónelo y cópielo manualmente."
   },
   "settings": {
     "title": "Configuración del flujo",

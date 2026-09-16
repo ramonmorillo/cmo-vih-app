@@ -413,6 +413,7 @@ function renderReportStage(state, analysis) {
       <summary>${t('exports.title')}</summary>
       <div class="button-row button-row--wrap">
         <button id="summaryExportBtn">${t('buttons.exportSummary')}</button>
+        <button id="copyRecordBtn" class="button-secondary">${t('buttons.copyRecord')}</button>
         <button id="jsonExportBtn" class="button-secondary">${t('buttons.exportJson')}</button>
         <button id="csvExportBtn" class="button-secondary">${t('buttons.exportCsv')}</button>
         <button id="printBtn" class="button-secondary">${t('buttons.print')}</button>
