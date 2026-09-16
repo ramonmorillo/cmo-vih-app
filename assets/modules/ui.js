@@ -314,6 +314,11 @@ export function renderApp(state) {
         </div>
       </header>
 
+      <div class="privacy-banner" role="note">
+        <span class="privacy-banner__icon" aria-hidden="true">🔒</span>
+        <span>${t('legal.privacyDisclaimer')}</span>
+      </div>
+
       <section class="progress-card">
         <div>
           <strong>${t('progress.title')}</strong>
