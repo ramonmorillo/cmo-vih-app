@@ -4,6 +4,28 @@
     "subtitle": "Privacy-first HIV pharmaceutical care support tool for pilot clinical workflows, explainable scoring, and AI-assisted text intake.",
     "language": "Language"
   },
+  "wizard": {
+    "stageIntro": "Start",
+    "stageNarrative": "Clinical text",
+    "stageReview": "Review",
+    "stageStratify": "Stratification",
+    "stageSavedCases": "Saved cases",
+    "stageReport": "Report",
+    "introEyebrow": "New stratification",
+    "introTitle": "How would you like to start this case?",
+    "introLead": "Choose how to begin. Whichever route you pick, you can review and edit every variable manually before the classification is calculated.",
+    "routeManualTitle": "Manual stratification",
+    "routeManualBody": "Complete each CMO-VIH variable directly from confirmed clinical information.",
+    "routeManualCta": "Start manual entry",
+    "routeAiTitle": "AI-assisted text analysis",
+    "routeAiBody": "Paste de-identified clinical text, review every extracted finding, and complete what remains pending.",
+    "routeAiCta": "Analyze clinical text",
+    "continueToReview": "Continue to variable review",
+    "continueToStratify": "Continue to stratification",
+    "continueToSavedCases": "Continue to saved cases",
+    "continueToReport": "Continue to report",
+    "skipToReview": "Skip and go to variable review"
+  },
   "common": {
     "none": "None",
     "selectPlaceholder": "Select an option",

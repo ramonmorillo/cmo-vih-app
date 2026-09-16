@@ -104,6 +104,73 @@ textarea { min-height: 180px; resize: vertical; }
   font-size: 1.05rem;
   line-height: 1;
 }
+
+.wizard-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 12px;
+  z-index: 5;
+}
+.wizard-step {
+  background: transparent;
+  color: var(--muted);
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  white-space: nowrap;
+}
+.wizard-step.is-active {
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  color: white;
+}
+.wizard-step:not(:disabled):not(.is-active):hover {
+  background: rgba(139, 30, 63, 0.08);
+  color: var(--primary-strong);
+  opacity: 1;
+}
+.wizard-step:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.wizard-stage {
+  display: grid;
+  gap: 20px;
+}
+
+.route-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.route-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 22px;
+  background: var(--surface-alt);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+.route-card:hover {
+  border-color: rgba(139, 30, 63, 0.35);
+  box-shadow: 0 12px 28px rgba(139, 30, 63, 0.1);
+}
+.route-card p {
+  flex: 1;
+  color: var(--muted);
+}
+.route-icon {
+  font-size: 1.8rem;
+}
 .progress-card, .dashboard-section { padding: 20px 24px; }
 .progress-card {
   display: flex;
@@ -504,6 +571,8 @@ details.section-card summary::-webkit-details-marker { display: none; }
   .modal-backdrop { padding: 16px; }
   .progress-right { min-width: 0; width: 100%; }
   .privacy-banner { border-radius: 0; }
+  .wizard-nav { position: static; border-radius: 0; }
+  .route-grid { grid-template-columns: 1fr; }
   .foundation-shell { padding: 22px 18px; }
   .foundation-meta { min-width: 0; justify-items: start; }
   .foundation-tag-row { justify-content: flex-start; }

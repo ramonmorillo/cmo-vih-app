@@ -20,6 +20,11 @@ export function createUiState() {
     importType: 'json',
     savedCasesOpen: true,
     unsavedChanges: false,
+    wizard: {
+      mode: null,
+      stage: 'intro',
+      unlockedStages: ['intro']
+    },
     modals: {
       newCase: {
         open: false

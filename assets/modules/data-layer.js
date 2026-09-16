@@ -34,6 +34,13 @@ function applyStateDefaults(parsed = {}) {
     ui: {
       ...base.ui,
       ...(parsed.ui || {}),
+      wizard: {
+        ...base.ui.wizard,
+        ...(parsed.ui?.wizard || {}),
+        unlockedStages: Array.isArray(parsed.ui?.wizard?.unlockedStages) && parsed.ui.wizard.unlockedStages.length
+          ? parsed.ui.wizard.unlockedStages
+          : base.ui.wizard.unlockedStages
+      },
       modals: {
         ...base.ui.modals,
         ...(parsed.ui?.modals || {}),
@@ -111,6 +118,27 @@ export function updateSavedCasesFilters(state, payload) {
     ...payload
   };
   next.savedCases.filteredItems = filterAndSortCases(next.savedCases.items, next.savedCases.filters);
+  return next;
+}
+
+export function setWizardMode(state, mode) {
+  const next = cloneState(state);
+  next.ui.wizard = {
+    ...next.ui.wizard,
+    mode
+  };
+  return next;
+}
+
+export function setWizardStage(state, stage) {
+  const next = cloneState(state);
+  const unlockedStages = new Set(next.ui.wizard.unlockedStages || []);
+  unlockedStages.add(stage);
+  next.ui.wizard = {
+    ...next.ui.wizard,
+    stage,
+    unlockedStages: [...unlockedStages]
+  };
   return next;
 }
 
