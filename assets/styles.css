@@ -83,6 +83,27 @@ textarea { min-height: 180px; resize: vertical; }
   padding: 0.65rem 0.95rem;
   font-size: 0.9rem;
 }
+.hero__actions .locale-switcher,
+.hero__actions .version-pill {
+  padding-top: 6px;
+  border-top: 1px solid rgba(255,255,255,0.18);
+  opacity: 0.92;
+}
+.privacy-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 14px;
+  background: rgba(180, 83, 9, 0.08);
+  border: 1px solid rgba(180, 83, 9, 0.22);
+  color: var(--warning);
+  font-size: 0.92rem;
+}
+.privacy-banner__icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
 .progress-card, .dashboard-section { padding: 20px 24px; }
 .progress-card {
   display: flex;
@@ -123,6 +144,7 @@ textarea { min-height: 180px; resize: vertical; }
 .metric-card--accent { background: linear-gradient(135deg, #8b1e3f, #1f3b73); color: white; }
 .metric-card__label { display: block; color: var(--muted); font-size: 0.85rem; margin-bottom: 8px; }
 .metric-card--accent .metric-card__label { color: rgba(255,255,255,0.8); }
+.metric-card--accent strong { font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
 .section-card { padding: 0; overflow: hidden; }
 details.section-card summary {
   list-style: none;
@@ -481,6 +503,7 @@ details.section-card summary::-webkit-details-marker { display: none; }
   .dashboard-section__meta { justify-content: flex-start; }
   .modal-backdrop { padding: 16px; }
   .progress-right { min-width: 0; width: 100%; }
+  .privacy-banner { border-radius: 0; }
   .foundation-shell { padding: 22px 18px; }
   .foundation-meta { min-width: 0; justify-items: start; }
   .foundation-tag-row { justify-content: flex-start; }
