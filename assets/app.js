@@ -34,6 +34,7 @@ import {
   upsertSavedCase
 } from './modules/case-storage.js';
 import {
+  buildClinicalRecordText,
   buildClinicalSummary,
   buildCsvExport,
   buildPrintableHtml,
@@ -245,6 +246,37 @@ function exportSummary() {
   downloadBlob('cmo-vih-summary.txt', buildClinicalSummary(state, state.analysis, t));
 }
 
+function copyTextToClipboardFallback(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.select();
+  const succeeded = document.execCommand('copy');
+  document.body.removeChild(textarea);
+  if (!succeeded) {
+    throw new Error('execCommand copy failed');
+  }
+}
+
+async function copyToClinicalRecord() {
+  if (!state.analysis) return;
+  const text = buildClinicalRecordText(state, state.analysis, t);
+
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      copyTextToClipboardFallback(text);
+    }
+    window.alert(t('exports.copySuccess'));
+  } catch (error) {
+    window.alert(t('exports.copyError'));
+  }
+}
+
 function exportJson() {
   if (!state.analysis) return;
   downloadBlob(`cmo-vih-${state.patientCase.caseId}.json`, JSON.stringify(buildStructuredReport(state, state.analysis, t), null, 2), 'application/json;charset=utf-8');
@@ -370,6 +402,7 @@ function bindEvents() {
   document.getElementById('clinicianName')?.addEventListener('change', handleClinicianUpdate);
   document.getElementById('centerName')?.addEventListener('change', handleClinicianUpdate);
   document.getElementById('summaryExportBtn')?.addEventListener('click', exportSummary);
+  document.getElementById('copyRecordBtn')?.addEventListener('click', copyToClinicalRecord);
   document.getElementById('jsonExportBtn')?.addEventListener('click', exportJson);
   document.getElementById('csvExportBtn')?.addEventListener('click', exportCsv);
   document.getElementById('printBtn')?.addEventListener('click', printReport);

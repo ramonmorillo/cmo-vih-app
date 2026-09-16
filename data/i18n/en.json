@@ -39,6 +39,7 @@
     "import": "Import data",
     "recalculate": "Recalculate classification",
     "exportSummary": "Clinical summary",
+    "copyRecord": "Copy to clinical record",
     "exportJson": "Research JSON",
     "exportCsv": "Research CSV",
     "print": "Printable report",
@@ -257,7 +258,9 @@
     "keyDrivers": "Key drivers",
     "riskFlags": "Risk flags",
     "source": "Input source",
-    "timestamp": "Timestamp"
+    "timestamp": "Timestamp",
+    "copySuccess": "Report copied to clipboard. You can now paste it into the clinical record.",
+    "copyError": "Could not copy the report automatically. Please select and copy it manually."
   },
   "settings": {
     "title": "Workflow settings",

@@ -39,6 +39,7 @@
     "import": "Importar dados",
     "recalculate": "Recalcular estratificação",
     "exportSummary": "Resumo clínico",
+    "copyRecord": "Copiar para o prontuário",
     "exportJson": "JSON de pesquisa",
     "exportCsv": "CSV de pesquisa",
     "print": "Relatório imprimível",
@@ -257,7 +258,9 @@
     "keyDrivers": "Fatores-chave",
     "riskFlags": "Alertas de risco",
     "source": "Fonte de entrada",
-    "timestamp": "Carimbo de data/hora"
+    "timestamp": "Carimbo de data/hora",
+    "copySuccess": "Relatório copiado para a área de transferência. Agora você pode colá-lo no prontuário.",
+    "copyError": "Não foi possível copiar o relatório automaticamente. Selecione-o e copie manualmente."
   },
   "settings": {
     "title": "Configurações do fluxo de trabalho",

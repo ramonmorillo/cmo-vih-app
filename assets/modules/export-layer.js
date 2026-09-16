@@ -42,6 +42,36 @@ export function buildStructuredReport(state, analysis, translate) {
   };
 }
 
+export function buildClinicalRecordText(state, analysis, translate) {
+  const locale = state.locale === 'es' ? 'es-ES' : state.locale === 'pt' ? 'pt-BR' : 'en-US';
+  const timestamp = new Date(analysis.traceability.timestamp).toLocaleString(locale);
+  const drivers = analysis.explainability.keyDrivers
+    .map((item) => `- ${item.label}: ${item.valueLabel} (+${item.score})`)
+    .join('\n') || `- ${translate('common.none')}`;
+  const interventions = analysis.interventions.length
+    ? analysis.interventions.map((item) => `- ${item}`).join('\n')
+    : `- ${translate('common.none')}`;
+
+  return [
+    `${translate('exports.summaryTitle')} — ${APP_VERSION}`,
+    `${translate('traceability.caseId')}: ${state.patientCase.caseId} | ${translate('savedCases.patientLabel')}: ${state.patientCase.pseudonymizedPatientLabel || translate('common.none')}`,
+    `${translate('exports.timestamp')}: ${timestamp}`,
+    '',
+    `${analysis.priorityLabel} (${translate('exports.totalScore')}: ${analysis.total})`,
+    `${translate('exports.followUp')}: ${analysis.followUp}`,
+    '',
+    `${translate('exports.keyDrivers')}:`,
+    drivers,
+    '',
+    `${translate('exports.riskFlags')}: ${analysis.riskFlags.join('; ') || translate('common.none')}`,
+    '',
+    `${translate('dashboard.suggestedInterventions')}:`,
+    interventions,
+    '',
+    translate('legal.clinicalDisclaimer')
+  ].join('\n');
+}
+
 export function buildCsvExport(state, analysis) {
   const headers = ['version', 'caseId', 'patientLabel', 'timestamp', 'source', 'finalLevel', 'totalScore', 'followUp', 'riskFlags'];
   const row = [
