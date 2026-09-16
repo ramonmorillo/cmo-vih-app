@@ -227,6 +227,7 @@ details.section-card summary::-webkit-details-marker { display: none; }
 .field-card__header { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
 .field-card__label { font-weight: 600; }
 .field-card__meta, .supporting-text, .trace-list, .report-box, .empty-panel, small { color: var(--muted); }
+.supporting-text { white-space: pre-line; }
 .panel-grid--two { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .explainability-grid { padding: 18px 20px 20px; }
 .contribution-list { display: grid; gap: 10px; }
@@ -254,7 +255,9 @@ details.section-card summary::-webkit-details-marker { display: none; }
 .badge--confirmed { background: rgba(15,118,110,0.14); color: var(--success); }
 .badge--extracted { background: rgba(29,78,216,0.14); color: #1d4ed8; }
 .badge--inferred { background: rgba(180,83,9,0.14); color: var(--warning); }
-.badge--missing { background: rgba(185,28,28,0.12); color: var(--danger); }
+.badge--absent { background: rgba(21,128,61,0.14); color: #15803d; }
+.badge--review { background: rgba(194,65,12,0.16); color: #c2410c; }
+.badge--missing { background: rgba(107,114,128,0.14); color: var(--muted); }
 .trace-list, .bullet-list { margin: 0; padding-left: 1.2rem; }
 .ai-grid { grid-template-columns: 1fr; }
 .ai-item { display: grid; gap: 6px; }

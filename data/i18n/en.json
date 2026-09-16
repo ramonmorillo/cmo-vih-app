@@ -170,7 +170,9 @@
     "confirmed": "Confirmed",
     "extracted": "Extracted",
     "inferred": "Inferred",
-    "missing": "Missing"
+    "absent": "Absent",
+    "review": "Needs review",
+    "missing": "Not documented"
   },
   "priority": {
     "priority1": "Priority 1 — High",
@@ -218,6 +220,7 @@
     "modifications": "Clinician modifications",
     "source": "Source",
     "evidence": "Evidence",
+    "suggestedValue": "Suggested value",
     "autosave": "Autosave",
     "caseId": "Case ID"
   },
@@ -226,7 +229,7 @@
     "empty": "Run the engine to display score contributions and rationale.",
     "whyTitle": "Why this level?",
     "contribTitle": "Variable contributions",
-    "missingTitle": "Missing data",
+    "missingTitle": "Pending data",
     "totalScore": "Deterministic total score: {total}.",
     "autoLevel": "Automatic classification based on explicit rules: {level}.",
     "overrideApplied": "Clinician override applied. Final level set to {level}.",
@@ -234,10 +237,13 @@
   },
   "ai": {
     "title": "AI-assisted intake",
-    "instructions": "The AI module extracts structured variables from pasted text, labels each finding as extracted or inferred, and never fills undocumented values.",
+    "instructions": "The AI module extracts structured variables from pasted text, distinguishes present information from explicit clinical absence and from no information at all, flags ambiguous findings for review, and never fills undocumented values.",
     "empty": "No AI-derived variables yet.",
-    "summaryDetected": "The text-processing module populated {count} structured variables while leaving unresolved variables as missing.",
-    "summaryNone": "No structured variables could be extracted confidently from the pasted text.",
+    "summaryPresent": "{count} variables identified in the text.",
+    "summaryAbsent": "{count} explicit clinical absences.",
+    "summaryUnknown": "{count} variables with no information in the text (still pending).",
+    "summaryReview": "{count} need manual review.",
+    "summarySkipped": "{count} left unchanged because they already had confirmed data.",
     "analysisComplete": "AI-assisted extraction completed. Human validation remains required."
   },
   "override": {

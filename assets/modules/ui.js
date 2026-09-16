@@ -23,6 +23,8 @@ function stateBadge(status, translate) {
     confirmed: translate('statuses.confirmed'),
     extracted: translate('statuses.extracted'),
     inferred: translate('statuses.inferred'),
+    absent: translate('statuses.absent'),
+    review: translate('statuses.review'),
     missing: translate('statuses.missing')
   };
   return map[status] || translate('statuses.missing');
@@ -39,6 +41,9 @@ function optionHtml(field, selectedValue) {
 }
 
 function renderFieldCard(field, fieldState) {
+  const suggested = fieldState.status === 'review' && fieldState.suggestedValue
+    ? `<span class="field-card__meta">${t('traceability.suggestedValue')}: ${t(field.optionLabelKeys[fieldState.suggestedValue]) || fieldState.suggestedValue}</span>`
+    : '';
   return `
     <label class="field-card">
       <span class="field-card__header">
@@ -48,6 +53,7 @@ function renderFieldCard(field, fieldState) {
       <select data-field-id="${field.id}" class="manual-select">
         ${optionHtml(field, fieldState.value)}
       </select>
+      ${suggested}
       <span class="field-card__meta">${t('traceability.source')}: ${fieldState.source || t('common.none')} · ${t('traceability.evidence')}: ${fieldState.evidence || t('common.none')}</span>
     </label>
   `;
@@ -157,14 +163,19 @@ function renderExplainability(analysis) {
 function renderAiPanel(state) {
   const items = Object.entries(state.patientCase.fields)
     .filter(([, value]) => value.source === 'ai')
-    .map(([fieldId, value]) => `
+    .map(([fieldId, value]) => {
+      const displayValue = value.value
+        ? t(`options.${value.value}`)
+        : (value.suggestedValue ? `${t('traceability.suggestedValue')}: ${t(`options.${value.suggestedValue}`)}` : t('common.none'));
+      return `
       <div class="ai-item">
         <strong>${t(`fields.${fieldId}`)}</strong>
-        <span>${value.value ? t(`options.${value.value}`) : value.value}</span>
+        <span>${displayValue}</span>
         <span class="badge badge--${value.status}">${stateBadge(value.status, t)}</span>
         <small>${value.evidence || t('common.none')}</small>
       </div>
-    `)
+    `;
+    })
     .join('');
 
   return items || `<div class="empty-panel">${t('ai.empty')}</div>`;

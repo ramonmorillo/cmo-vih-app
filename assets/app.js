@@ -125,13 +125,29 @@ function handleAnalyzeText() {
   const narrative = document.getElementById('narrativeInput').value.trim();
   state = updateNarrative(state, narrative, 'text');
   const extraction = extractFromNarrative(narrative, state.patientCase.fields, t);
-  state.patientCase.notes = extraction.explanation;
+
+  // Never silently overwrite a value the clinician already confirmed or typed manually.
+  let skippedCount = 0;
   Object.entries(extraction.updates).forEach(([fieldId, payload]) => {
+    const existingField = state.patientCase.fields[fieldId];
+    const hasConfirmedData = existingField?.clinicianConfirmed || (existingField?.source === 'manual' && existingField?.value);
+    if (hasConfirmedData) {
+      skippedCount += 1;
+      return;
+    }
     state = updateField(state, fieldId, payload);
   });
+
+  const summaryLines = [extraction.explanation];
+  if (skippedCount) {
+    summaryLines.push(t('ai.summarySkipped', { count: skippedCount }));
+  }
+  const summary = summaryLines.join('\n');
+  state.patientCase.notes = summary;
+
   state = setWizardStage(state, 'review');
   persistAndRender();
-  window.alert(`${t('ai.analysisComplete')}\n${extraction.explanation}`);
+  window.alert(`${t('ai.analysisComplete')}\n\n${summary}`);
 }
 
 function handleLoadExample() {

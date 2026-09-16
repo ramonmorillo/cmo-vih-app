@@ -170,7 +170,9 @@
     "confirmed": "Confirmado",
     "extracted": "Extraído",
     "inferred": "Inferido",
-    "missing": "Ausente"
+    "absent": "Ausente",
+    "review": "Requiere revisión",
+    "missing": "No documentado"
   },
   "priority": {
     "priority1": "Prioridad 1 — Alta",
@@ -218,6 +220,7 @@
     "modifications": "Modificaciones del clínico",
     "source": "Origen",
     "evidence": "Evidencia",
+    "suggestedValue": "Valor sugerido",
     "autosave": "Autoguardado",
     "caseId": "ID del caso"
   },
@@ -226,7 +229,7 @@
     "empty": "Ejecute el motor para mostrar contribuciones y justificación.",
     "whyTitle": "¿Por qué este nivel?",
     "contribTitle": "Contribución por variable",
-    "missingTitle": "Datos ausentes",
+    "missingTitle": "Datos pendientes",
     "totalScore": "Puntuación total determinista: {total}.",
     "autoLevel": "Clasificación automática basada en reglas explícitas: {level}.",
     "overrideApplied": "Se aplicó una modificación del clínico. Nivel final fijado en {level}.",
@@ -234,10 +237,13 @@
   },
   "ai": {
     "title": "Ingesta asistida por IA",
-    "instructions": "El módulo de IA extrae variables estructuradas del texto pegado, etiqueta cada hallazgo como extraído o inferido y nunca completa valores no documentados.",
+    "instructions": "El módulo de IA extrae variables estructuradas del texto pegado, distingue información presente, ausencia clínica explícita y ausencia de información, marca los hallazgos ambiguos para revisión y nunca completa valores no documentados.",
     "empty": "Todavía no hay variables derivadas por IA.",
-    "summaryDetected": "El módulo de procesamiento de texto completó {count} variables estructuradas y dejó como ausentes las no resueltas.",
-    "summaryNone": "No se pudieron extraer variables estructuradas con suficiente confianza del texto pegado.",
+    "summaryPresent": "{count} variables identificadas en el texto.",
+    "summaryAbsent": "{count} ausencias clínicas explícitas.",
+    "summaryUnknown": "{count} variables sin información en el texto (pendientes).",
+    "summaryReview": "{count} requieren revisión manual.",
+    "summarySkipped": "{count} no se modificaron por tener datos ya confirmados.",
     "analysisComplete": "Extracción asistida por IA completada. Sigue siendo obligatoria la validación humana."
   },
   "override": {
