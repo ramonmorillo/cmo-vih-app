@@ -1,0 +1,11 @@
+{
+  "name": "cmo-design-system",
+  "version": "0.2.0",
+  "files": {
+    "cmo-tokens.css": "b9a4322792efa3a2a6ad473c7f5120dfcb1602e65054cc188413b9de2d43d629",
+    "cmo-components.css": "fab917ed91e1cca21666362ac702acf9132d3e14a62223e7c9b112882defa61c",
+    "cmo-author-signature.js": "89a9913cc9d9c067711d17a3ba7d477df3b3e2711c32516a0d97e9ecf9935d3a",
+    "cmo-mark.svg": "e72f40cf434fee0101c8da40825fd49908d7183afd19b241b2974e2946b3ac1c",
+    "favicon.svg": "8f9fadf72c9bc22b6bafa1fb0d5a2c3bc82864c061de01f773012313790ed22f"
+  }
+}

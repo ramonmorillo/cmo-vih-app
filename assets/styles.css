@@ -1,15 +1,16 @@
-@import url("./cmo-visual.css");
+@import url("./cmo-ds/cmo-tokens.css");
+@import url("./cmo-ds/cmo-components.css");
 
 :root {
-  --bg: #f4f6fb;
-  --surface: #ffffff;
-  --surface-alt: #f9fafb;
-  --line: #d7dce5;
-  --text: #1f2937;
-  --muted: #6b7280;
-  --primary: #8b1e3f;
-  --primary-strong: #6f1431;
-  --accent: #dfe8ff;
+  --bg: var(--cmo-paper);
+  --surface: var(--cmo-surface);
+  --surface-alt: var(--cmo-surface-sunk);
+  --line: var(--cmo-rule);
+  --text: var(--cmo-ink);
+  --muted: var(--cmo-ink-muted);
+  --primary: var(--cmo-brand-strong);
+  --primary-strong: var(--cmo-ink);
+  --accent: var(--cmo-brand-soft);
   --success: #0f766e;
   --warning: #b45309;
   --danger: #b91c1c;
@@ -19,8 +20,8 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
-  background: linear-gradient(180deg, #eef1f8 0%, #f9fbfd 100%);
+  font-family: var(--cmo-font-sans);
+  background: var(--cmo-paper);
   color: var(--text);
 }
 button, select, input, textarea {
