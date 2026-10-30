@@ -1,7 +1,7 @@
 {
   "header": {
     "eyebrow": "Sistema semiclínico de soporte a la decisión",
-    "subtitle": "Herramienta de soporte para atención farmacéutica del VIH, centrada en la privacidad, con estratificación explicable e ingesta asistida por IA.",
+    "subtitle": "Herramienta de soporte para atención farmacéutica del VIH, centrada en la privacidad, con estratificación explicable e ingesta asistida por reglas locales.",
     "language": "Idioma"
   },
   "wizard": {
@@ -68,7 +68,7 @@
   "inputs": {
     "manualSection": "Entrada estructurada manual",
     "textSection": "Pegar texto clínico",
-    "textPlaceholder": "Pegue aquí texto clínico desidentificado. El módulo de IA extrae variables estructuradas, marca datos extraídos frente a inferidos y deja como ausentes los elementos desconocidos.",
+    "textPlaceholder": "Pegue aquí texto clínico desidentificado. El módulo de extracción por reglas locales extrae variables estructuradas, marca datos extraídos frente a inferidos y deja como ausentes los elementos desconocidos.",
     "importSection": "Importación JSON / CSV",
     "importPlaceholder": "Pegue un objeto JSON o una línea CSV con identificadores de campo coincidentes.",
     "futureIntegration": "Preparado para futuros conectores con la HCE mediante el esquema de caso compartido. No se implementa integración real en esta versión estática.",
@@ -236,15 +236,15 @@
     "noOverride": "No hay modificación clínica activa."
   },
   "ai": {
-    "title": "Ingesta asistida por IA",
-    "instructions": "El módulo de IA extrae variables estructuradas del texto pegado, distingue información presente, ausencia clínica explícita y ausencia de información, marca los hallazgos ambiguos para revisión y nunca completa valores no documentados.",
-    "empty": "Todavía no hay variables derivadas por IA.",
+    "title": "Ingesta asistida (reglas locales)",
+    "instructions": "El módulo de extracción por reglas locales extrae variables estructuradas del texto pegado, distingue información presente, ausencia clínica explícita y ausencia de información, marca los hallazgos ambiguos para revisión y nunca completa valores no documentados.",
+    "empty": "Todavía no hay variables derivadas de la extracción.",
     "summaryPresent": "{count} variables identificadas en el texto.",
     "summaryAbsent": "{count} ausencias clínicas explícitas.",
     "summaryUnknown": "{count} variables sin información en el texto (pendientes).",
     "summaryReview": "{count} requieren revisión manual.",
     "summarySkipped": "{count} no se modificaron por tener datos ya confirmados.",
-    "analysisComplete": "Extracción asistida por IA completada. Sigue siendo obligatoria la validación humana."
+    "analysisComplete": "Extracción asistida por reglas locales completada. Sigue siendo obligatoria la validación humana."
   },
   "override": {
     "title": "Modificación del clínico",
@@ -280,7 +280,7 @@
   },
   "legal": {
     "clinicalDisclaimer": "Soporte a la decisión clínica únicamente; no sustituye el juicio profesional.",
-    "aiDisclaimer": "La extracción asistida por IA puede contener errores y requiere validación humana.",
+    "aiDisclaimer": "La extracción asistida por reglas locales puede contener errores y requiere validación humana.",
     "privacyDisclaimer": "Diseño centrado en la privacidad; no requiere identificadores personales.",
     "regulatoryDisclaimer": "No es un producto sanitario certificado; destinado a investigación, soporte y uso piloto.",
     "ipDisclaimer": "CMO-VIH Pro v3 — Septiembre 2026. Todos los derechos reservados. Prohibida su reproducción sin permiso."
