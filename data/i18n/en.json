@@ -1,7 +1,7 @@
 {
   "header": {
     "eyebrow": "Semi-clinical decision-support system",
-    "subtitle": "Privacy-first HIV pharmaceutical care support tool for pilot clinical workflows, explainable scoring, and AI-assisted text intake.",
+    "subtitle": "Privacy-first HIV pharmaceutical care support tool for pilot clinical workflows, explainable scoring, and rule-assisted text intake.",
     "language": "Language"
   },
   "wizard": {
@@ -17,7 +17,7 @@
     "routeManualTitle": "Manual stratification",
     "routeManualBody": "Complete each CMO-VIH variable directly from confirmed clinical information.",
     "routeManualCta": "Start manual entry",
-    "routeAiTitle": "AI-assisted text analysis",
+    "routeAiTitle": "Assisted text analysis",
     "routeAiBody": "Paste de-identified clinical text, review every extracted finding, and complete what remains pending.",
     "routeAiCta": "Analyze clinical text",
     "continueToReview": "Continue to variable review",
@@ -68,7 +68,7 @@
   "inputs": {
     "manualSection": "Manual structured input",
     "textSection": "Paste clinical text",
-    "textPlaceholder": "Paste de-identified clinical text here. The AI module extracts structured variables, marks extracted vs inferred data, and leaves unknown items missing.",
+    "textPlaceholder": "Paste de-identified clinical text here. The local rule-based extraction module extracts structured variables, marks extracted vs inferred data, and leaves unknown items missing.",
     "importSection": "JSON / CSV import",
     "importPlaceholder": "Paste a JSON object or a one-line CSV file with matching field IDs.",
     "futureIntegration": "Prepared for future EHR connectors through the shared case schema. No live integration is implemented in this static version.",
@@ -236,15 +236,15 @@
     "noOverride": "No clinician override is currently applied."
   },
   "ai": {
-    "title": "AI-assisted intake",
-    "instructions": "The AI module extracts structured variables from pasted text, distinguishes present information from explicit clinical absence and from no information at all, flags ambiguous findings for review, and never fills undocumented values.",
-    "empty": "No AI-derived variables yet.",
+    "title": "Assisted intake (local rules)",
+    "instructions": "The local rule-based extraction module extracts structured variables from pasted text, distinguishes present information from explicit clinical absence and from no information at all, flags ambiguous findings for review, and never fills undocumented values.",
+    "empty": "No extracted variables yet.",
     "summaryPresent": "{count} variables identified in the text.",
     "summaryAbsent": "{count} explicit clinical absences.",
     "summaryUnknown": "{count} variables with no information in the text (still pending).",
     "summaryReview": "{count} need manual review.",
     "summarySkipped": "{count} left unchanged because they already had confirmed data.",
-    "analysisComplete": "AI-assisted extraction completed. Human validation remains required."
+    "analysisComplete": "Rule-based assisted extraction completed. Human validation remains required."
   },
   "override": {
     "title": "Clinician override",
@@ -280,7 +280,7 @@
   },
   "legal": {
     "clinicalDisclaimer": "Clinical decision support only — not a substitute for clinician judgment.",
-    "aiDisclaimer": "AI-assisted extraction may contain errors and requires human validation.",
+    "aiDisclaimer": "Rule-based assisted extraction may contain errors and requires human validation.",
     "privacyDisclaimer": "Privacy-first design — no personal identifiers are required.",
     "regulatoryDisclaimer": "Not a certified medical device; intended for research, support, and pilot use.",
     "ipDisclaimer": "CMO-VIH Pro v3 — September 2026. All rights reserved. No reproduction without permission."
