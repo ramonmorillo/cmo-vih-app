@@ -1,6 +1,10 @@
 # CHANGELOG.md
 
-## Unreleased — CMO Design System 0.2.0 identity (branch `design/cmo-ds-0.1.0`)
+## 3.1.0 — 2026-10-30
+
+Release (author's decision: minor version bump for the interface change). `package.json` and `cmo-app-meta` 3.0.0 → 3.1.0; `cmo-app-meta`: `status: "released"`, `releaseDate: "2026-10-30"`. Includes both sections below, previously unreleased. CMO scoring logic unchanged. The «CMO-VIH Pro v3 — September 2026» texts in `data/i18n` are unchanged (major version 3).
+
+### CMO Design System 0.2.0 identity
 
 Visual-only change. No changes to `assets/modules/*`, `assets/app.js` or `data/i18n/*`; `APP_VERSION` unchanged.
 - Pinned copy of CMO Design System 0.2.0 in `assets/cmo-ds/` (SHA-256 manifest).
@@ -9,7 +13,7 @@ Visual-only change. No changes to `assets/modules/*`, `assets/app.js` or `data/i
 - Accessibility: keyboard focus from #ffbf47 (1.6:1) to #1f3aa8 (9.4:1); field borders from #d7dce5 (1.4:1) to #7b8495 (≥3:1). Fixes a pre-existing insufficient contrast in data-origin badges (`.badge--*`), keeping each state's hue.
 - Tests: `tests/cmo-ds.test.js`.
 
-## Unreleased
+### Extraction status model
 - Reworked the AI-assisted free-text extraction status model (`assets/modules/ai-module.js`):
   - Root cause of "only 4 variables extracted from a rich clinical note": the module only had a
     PRESENT/no-match binary — an explicit denial ("no ingresos hospitalarios") and a concept never
