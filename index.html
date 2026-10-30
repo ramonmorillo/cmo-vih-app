@@ -8,10 +8,42 @@
       name="description"
       content="CMO-VIH Pro v3 is a bilingual, explainable, privacy-first HIV pharmaceutical care decision-support tool for pilot clinical workflows."
     />
+    <link rel="icon" href="assets/cmo-ds/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#14203a" />
     <link rel="stylesheet" href="assets/styles.css" />
+    <link rel="stylesheet" href="assets/cmo-visual.css" />
+    <script type="application/json" id="cmo-app-meta">
+      {
+        "schema": "cmo-app-meta/1",
+        "id": "cmo-vih",
+        "name": "CMO-VIH Pro",
+        "appVersion": "3.0.0",
+        "algorithm": null,
+        "status": "draft",
+        "releaseDate": null,
+        "clinicalReviewDate": null,
+        "credits": [
+          {
+            "role": { "es": "Concepto, autoría y dirección científica", "en": "Concept, authorship, and scientific leadership", "pt": "Conceito, autoria e liderança científica" },
+            "name": "Dr. Ramón Morillo-Verdugo"
+          },
+          {
+            "role": { "es": "Base científica", "en": "Scientific basis", "pt": "Base científica" },
+            "name": "Morillo-Verdugo R, Robustillo-Cortés MA, et al. Journal of Multidisciplinary Healthcare, 2022"
+          }
+        ],
+        "website": "https://ramonmorillo.es",
+        "copyright": { "year": "2026", "holders": ["Ramón Morillo-Verdugo"] },
+        "designSystem": "0.2.0"
+      }
+    </script>
+    <script type="module" src="assets/cmo-ds/cmo-author-signature.js"></script>
   </head>
-  <body>
+  <body class="cmo-scope">
     <div id="app"></div>
+    <div class="cmo-app-footer">
+      <cmo-author-signature meta="cmo-app-meta"><p>Dr. Ramón Morillo-Verdugo · <a href="https://ramonmorillo.es">ramonmorillo.es</a></p></cmo-author-signature>
+    </div>
     <script type="module" src="assets/app.js"></script>
   </body>
 </html>

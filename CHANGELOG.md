@@ -1,5 +1,14 @@
 # CHANGELOG.md
 
+## Unreleased — CMO Design System 0.2.0 identity (branch `design/cmo-ds-0.1.0`)
+
+Visual-only change. No changes to `assets/modules/*`, `assets/app.js` or `data/i18n/*`; `APP_VERSION` unchanged.
+- Pinned copy of CMO Design System 0.2.0 in `assets/cmo-ds/` (SHA-256 manifest).
+- `assets/cmo-visual.css` rewritten as the «Estratos» theme (loaded after `styles.css`); `styles.css` maps its neutral and brand variables to tokens. `--success/--warning/--danger` unchanged.
+- Multilingual `<cmo-author-signature>` (es/en/pt) that follows the app's active language; credits taken verbatim from `data/i18n/*.json` (authorship, scientific reference and ©).
+- Accessibility: keyboard focus from #ffbf47 (1.6:1) to #1f3aa8 (9.4:1); field borders from #d7dce5 (1.4:1) to #7b8495 (≥3:1). Fixes a pre-existing insufficient contrast in data-origin badges (`.badge--*`), keeping each state's hue.
+- Tests: `tests/cmo-ds.test.js`.
+
 ## Unreleased
 - Reworked the AI-assisted free-text extraction status model (`assets/modules/ai-module.js`):
   - Root cause of "only 4 variables extracted from a rich clinical note": the module only had a
