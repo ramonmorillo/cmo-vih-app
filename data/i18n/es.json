@@ -24,7 +24,9 @@
     "continueToStratify": "Continuar a la estratificación",
     "continueToSavedCases": "Continuar a casos guardados",
     "continueToReport": "Continuar al informe",
-    "skipToReview": "Omitir e ir a la revisión de variables"
+    "skipToReview": "Omitir e ir a la revisión de variables",
+    "stageFollowUp": "Seguimiento",
+    "continueToFollowUp": "Continuar a necesidades e intervenciones"
   },
   "common": {
     "none": "Ninguno",
@@ -46,7 +48,9 @@
     "newCase": "Nuevo paciente / Nuevo caso",
     "save": "Guardar",
     "savedCases": "Casos guardados",
-    "export": "Exportar"
+    "export": "Exportar",
+    "downloadPdf": "Descargar PDF",
+    "downloadText": "Descargar texto (.txt)"
   },
   "progress": {
     "title": "Progreso del flujo",
@@ -270,7 +274,11 @@
     "status": "Estado",
     "final": "Definitivo",
     "automaticLevel": "Clasificación automática",
-    "overrideLine": "Modificación del clínico: {level}. Motivo: {reason}"
+    "overrideLine": "Modificación del clínico: {level}. Motivo: {reason}",
+    "pdfDone": "PDF generado.",
+    "textDone": "Texto descargado.",
+    "blockedTitle": "Informe disponible",
+    "preview": "Texto para historia clínica"
   },
   "settings": {
     "title": "Configuración del flujo",
@@ -390,5 +398,23 @@
     "importRejected": "Datos importados. {count} valor(es) no admitidos por el modelo se han descartado: {fields}.",
     "importNothingValid": "el fichero no contiene valores válidos del modelo.",
     "importNotJson": "el contenido no es un JSON válido."
+  },
+  "followUp": {
+    "title": "Necesidades, intervenciones y seguimiento",
+    "lead": "Variables que puntúan, por sección del modelo, y datos pendientes. Registre el estado de cada intervención del modelo y el plan de seguimiento.",
+    "contrib": "Variables que puntúan",
+    "none": "Ninguna",
+    "pending": "Pendientes de valorar (potenciales)",
+    "pendingUnconfirmed": "propuesta sin confirmar",
+    "interventions": "Intervenciones del modelo",
+    "plan": "Plan de seguimiento",
+    "nextReview": "Próxima valoración prevista",
+    "notes": "Observaciones y acuerdos",
+    "status": {
+      "recommended": "Recomendada por el modelo (sin registrar)",
+      "done": "Realizada",
+      "planned": "Planificada",
+      "not_applicable": "No procede"
+    }
   }
 }

@@ -22,11 +22,17 @@ Puerta de revisión profesional, importación validada y estado provisional. **S
 - Textos en español, inglés y portugués para todo lo nuevo (`gate.*`, `exports.*`). **Portugués: pendiente de revisión** (ver `PT_REVIEW.md`).
 
 ### Pruebas
-- `npm test`: 61 (50 previas + 11: huellas, paridad con el motor en 300 casos, propuestas sin confirmar, modificación, importación, estado corrupto, exportaciones, borrador). `npm run test:e2e`: 4 recorridos en Chromium con axe WCAG A/AA opcional (`AXE_PATH`).
+- `npm test`: 61 en el primer bloque (50 previas + 11: huellas, paridad con el motor en 300 casos, propuestas sin confirmar, modificación, importación, estado corrupto, exportaciones, borrador). `npm run test:e2e`: 4 recorridos en Chromium con axe WCAG A/AA opcional (`AXE_PATH`).
 
-### No incluido todavía
-- Etapas «Necesidades» e «Intervenciones y seguimiento» con estado, y el informe único con PDF: requieren que el núcleo del hub admita etiquetas en es/en/pt (hoy solo español).
-- Pendientes heredados: `APP_VERSION` «v3 — September 2026»; claves de almacenamiento «v2»; idioma por defecto `en`.
+### Flujo común (etapas 5–6 e informe)
+- Nueva etapa **Seguimiento** tras la estratificación: variables que puntúan por sección del modelo, variables pendientes de valorar (con las propuestas sin confirmar señaladas), **estado de cada intervención del modelo** (realizada, planificada, no procede) y plan (próxima valoración y observaciones). El modelo no define otras «necesidades»: no se ha inventado ninguna.
+- **Informe único** (`cmo-report/1`, núcleo 0.3.0) en el idioma de la interfaz (es/en/pt): el texto para historia clínica, la vista previa, la impresión y el nuevo **PDF** salen de la misma estructura. Las funciones anteriores (`buildClinicalSummary`, `buildClinicalRecordText`, `buildPrintableHtml`) siguen exportadas pero la aplicación ya no las usa. Botón nuevo «Descargar texto (.txt)».
+- Casos guardados: incluyen el estado de las intervenciones y el plan; los casos anteriores se abren con valores vacíos.
+- Pruebas: 68 unitarias (7 nuevas del informe y del plan) y e2e ampliado (etapa de seguimiento, PDF, informe en inglés).
+
+### Pendiente
+- Revisión del portugués del núcleo (`LABELS.pt` en el hub) y de los textos nuevos (`PT_REVIEW.md`).
+- Heredados: `APP_VERSION` «v3 — September 2026»; claves de almacenamiento «v2»; idioma por defecto `en`.
 
 ## 3.1.0 — 2026-10-30
 

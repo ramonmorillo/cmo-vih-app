@@ -93,15 +93,38 @@ test('análisis asistido: nada puntúa hasta confirmar; un solo clic en «Analiz
   await page.click('#recalculateBtn');
   assert.match(await text(page, '.dashboard-grid'), /Prioridad 3/);
   assert.match(await text(page, '.dashboard-section'), /disminuye una prioridad automática/);
+  // Necesidades, intervenciones y seguimiento
+  await page.click('#continueToFollowUpBtn');
+  assert.match(await text(page, '.dashboard-section'), /Necesidades, intervenciones y seguimiento/);
+  assert.match(await text(page, '.dashboard-section'), /propuesta sin confirmar/, 'los pendientes distinguen las propuestas sin confirmar');
+  assert.ok(await page.locator('[data-intervention-id]').count() >= 3);
+  await page.selectOption('[data-intervention-id]:nth-of-type(1) >> nth=0', 'done');
+  await page.selectOption('[data-intervention-id] >> nth=1', 'planned');
+  await page.fill('#planNextReview', '2027-02-10'); await page.fill('#planNotes', '<img src=x onerror="window.__xss=1"> Revisión telefónica.'); await page.locator('#planNotes').blur();
+  await axe(page, 'seguimiento');
   // Informe: el estado y la modificación figuran en las salidas
   await page.click('#continueToSavedCasesBtn');
   await page.click('#continueToReportBtn');
   await page.click('#copyRecordBtn');
   await page.waitForFunction(() => document.querySelector('.cmo-toast') || true);
   const record = await page.evaluate(() => navigator.clipboard.readText());
-  assert.match(record, /Estado: Resultado provisional/);
-  assert.match(record, /Modificación del clínico: [^\n]*Justificación clínica ficticia suficiente/);
-  assert.match(record, /Clasificación automática:/);
+  assert.match(record, /Valoración: Provisional/);
+  assert.match(record, /Modificación por criterio profesional: [^\n]*Justificación clínica ficticia suficiente/);
+  assert.match(record, /Resultado calculado por el modelo:/);
+  assert.match(record, /Realizadas en esta consulta:/); assert.match(record, /Planificadas \/ pendientes:/); assert.match(record, /Próxima valoración prevista: 10\/02\/2027/);
+  assert.match(await text(page, '.report-box'), /RESULTADO DE ESTRATIFICACIÓN/);
+  assert.equal(await page.evaluate(() => window.__xss), undefined);
+  const [pdf] = await Promise.all([page.waitForEvent('download'), page.click('#pdfBtn')]);
+  const bytes = fs.readFileSync(await pdf.path());
+  assert.equal(bytes.subarray(0, 8).toString('latin1'), '%PDF-1.4'); assert.ok(bytes.toString('latin1').includes('Resultado de estratificaci'));
+  const [txt] = await Promise.all([page.waitForEvent('download'), page.click('#textBtn')]);
+  assert.match(fs.readFileSync(await txt.path(), 'utf8'), /RESULTADO DE ESTRATIFICACIÓN/);
+  // El mismo informe en inglés: rótulos del núcleo traducidos
+  await page.selectOption('#localeSelect', 'en');
+  await page.waitForFunction(() => document.getElementById('localeSelect').value === 'en' && /Stratification result/i.test(document.querySelector('.report-box')?.textContent || ''));
+  assert.doesNotMatch(await text(page, '.report-box'), /Fecha de evaluación|Resultado de estratificación/);
+  await page.selectOption('#localeSelect', 'es');
+  await page.waitForFunction(() => /RESULTADO DE ESTRATIFICACIÓN/.test(document.querySelector('.report-box')?.textContent || ''));
   assert.doesNotMatch(record, /Paciente embarazada|Vive solo/, 'el texto clínico pegado no llega al informe');
   const [json] = await Promise.all([page.waitForEvent('download'), page.click('#jsonExportBtn')]);
   const data = JSON.parse(fs.readFileSync(await json.path(), 'utf8'));
@@ -152,6 +175,8 @@ test('móvil 375 px: sin desbordamiento horizontal y propuestas visibles', skip,
   assert.ok(await overflow() <= 0, `revisión: desbordamiento ${await overflow()}px`);
   await page.click('#continueToStratifyBtn');
   assert.ok(await overflow() <= 0, `estratificación: desbordamiento ${await overflow()}px`);
+  await page.click('#continueToFollowUpBtn');
+  assert.ok(await overflow() <= 0, `seguimiento: desbordamiento ${await overflow()}px`);
   assert.deepEqual(errors, []);
 });
 

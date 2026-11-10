@@ -2,7 +2,10 @@ import { APP_VERSION, EXAMPLE_CASE, FIELD_DEFINITIONS } from './modules/config.j
 import { extractFromNarrative } from './modules/ai-module.js';
 import { evaluateCase } from './modules/cmo-engine.js';
 import { reviewSummary, sanitizeImportedRecord, scoringView } from './modules/review-gate.js';
-import { guardUnsaved, toast } from './cmo-ds/cmo-flow.js';
+import { createReport, reportToText, reportToHtml } from './cmo-ds/cmo-report.js';
+import { reportToPdf } from './cmo-ds/cmo-pdf.js';
+import { copyText, download, guardUnsaved, printHtml, safeFilename, toast } from './cmo-ds/cmo-flow.js';
+import { buildReportInput, toolVersion } from './modules/report-adapter.js';
 import {
   applyImportedRecord,
   createDefaultState,
@@ -14,7 +17,9 @@ import {
   parseJsonImport,
   resetCase,
   saveState,
+  setInterventionStatus,
   setNewCaseModal,
+  setPlan,
   setOverride,
   setSavedCases,
   setWizardMode,
@@ -36,10 +41,7 @@ import {
   upsertSavedCase
 } from './modules/case-storage.js';
 import {
-  buildClinicalRecordText,
-  buildClinicalSummary,
   buildCsvExport,
-  buildPrintableHtml,
   buildStructuredReport,
   downloadBlob
 } from './modules/export-layer.js';
@@ -281,40 +283,26 @@ function handleNewCaseClick() {
   startFreshCase(false);
 }
 
+// Informe único (cmo-report/1): el texto, la copia, la impresión y el PDF se generan de la misma estructura y en el idioma de la interfaz.
+const currentReport = () => createReport(buildReportInput(state, state.analysis, t, { version: toolVersion() }));
+const reportFile = (ext) => `${safeFilename('cmo-vih', state.patientCase.pseudonymizedPatientLabel || 'caso', state.patientCase.caseId)}.${ext}`;
+
 function exportSummary() {
   if (!state.analysis) return;
-  downloadBlob('cmo-vih-summary.txt', buildClinicalSummary(state, state.analysis, t));
+  download(reportFile('txt'), reportToText(currentReport()));
+  toast(t('exports.textDone'));
 }
 
-function copyTextToClipboardFallback(text) {
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  textarea.setAttribute('readonly', '');
-  textarea.style.position = 'fixed';
-  textarea.style.left = '-9999px';
-  document.body.appendChild(textarea);
-  textarea.select();
-  const succeeded = document.execCommand('copy');
-  document.body.removeChild(textarea);
-  if (!succeeded) {
-    throw new Error('execCommand copy failed');
-  }
+function exportPdf() {
+  if (!state.analysis) return;
+  download(reportFile('pdf'), reportToPdf(currentReport()), 'application/pdf');
+  toast(t('exports.pdfDone'));
 }
 
 async function copyToClinicalRecord() {
   if (!state.analysis) return;
-  const text = buildClinicalRecordText(state, state.analysis, t);
-
-  try {
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(text);
-    } else {
-      copyTextToClipboardFallback(text);
-    }
-    toast(t('exports.copySuccess'));
-  } catch (error) {
-    toast(t('exports.copyError'));
-  }
+  const ok = await copyText(reportToText(currentReport()));
+  toast(ok ? t('exports.copySuccess') : t('exports.copyError'), { type: ok ? 'info' : 'error' });
 }
 
 function exportJson() {
@@ -329,11 +317,19 @@ function exportCsv() {
 
 function printReport() {
   if (!state.analysis) return;
-  const popup = window.open('', '_blank', 'width=960,height=720');
-  popup.document.write(buildPrintableHtml(state, state.analysis, t));
-  popup.document.close();
-  popup.focus();
-  popup.print();
+  const report = currentReport();
+  printHtml(reportToHtml(report), report.title, state.locale);
+}
+
+function handleInterventionStatus(event) {
+  state = setInterventionStatus(state, event.target.dataset.interventionId, event.target.value);
+  persistAndRender();
+}
+
+function handlePlanChange(event) {
+  // Sin volver a dibujar: el re-render quitaría el foco del campo.
+  state = setPlan(state, { [event.target.id === 'planNextReview' ? 'nextReview' : 'notes']: event.target.value });
+  state = saveState(state);
 }
 
 async function handleSavedCaseAction(event) {
@@ -446,6 +442,12 @@ function bindEvents() {
   document.getElementById('jsonExportBtn')?.addEventListener('click', exportJson);
   document.getElementById('csvExportBtn')?.addEventListener('click', exportCsv);
   document.getElementById('printBtn')?.addEventListener('click', printReport);
+  document.getElementById('pdfBtn')?.addEventListener('click', exportPdf);
+  document.getElementById('textBtn')?.addEventListener('click', exportSummary);
+  document.querySelectorAll('[data-intervention-id]').forEach((element) => element.addEventListener('change', handleInterventionStatus));
+  document.getElementById('planNextReview')?.addEventListener('change', handlePlanChange);
+  document.getElementById('planNotes')?.addEventListener('change', handlePlanChange);
+  document.getElementById('continueToFollowUpBtn')?.addEventListener('click', () => goToStage('followUp'));
   document.getElementById('toolbarExportBtn')?.addEventListener('click', exportJson);
   document.getElementById('newCaseBtn')?.addEventListener('click', handleNewCaseClick);
   document.getElementById('toolbarSaveBtn')?.addEventListener('click', () => saveCurrentCase());

@@ -153,6 +153,22 @@ export function setWizardStage(state, stage) {
   return next;
 }
 
+export function setInterventionStatus(state, id, status) {
+  const next = cloneState(state);
+  const current = { ...(next.patientCase.interventionStatus || {}) };
+  if (status === 'recommended') delete current[id]; else current[id] = status;
+  next.patientCase.interventionStatus = current;
+  next.patientCase.updatedAt = new Date().toISOString();
+  return markCaseDirty(next);
+}
+
+export function setPlan(state, patch) {
+  const next = cloneState(state);
+  next.patientCase.plan = { ...(next.patientCase.plan || {}), ...patch };
+  next.patientCase.updatedAt = new Date().toISOString();
+  return markCaseDirty(next);
+}
+
 export function setNewCaseModal(state, open) {
   return updateUi(state, {
     modals: {
