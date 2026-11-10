@@ -88,10 +88,13 @@ export function buildCsvExport(state, analysis) {
   return `${headers.join(',')}\n${row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(',')}`;
 }
 
+// Todo dato del caso se escapa: la etiqueta, la narrativa o un JSON importado no deben interpretarse como HTML.
+const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
 export function buildPrintableHtml(state, analysis, translate) {
-  const drivers = analysis.explainability.keyDrivers.map((item) => `<li>${item.label}: ${item.valueLabel} (+${item.score})</li>`).join('');
-  const flags = analysis.riskFlags.map((item) => `<li>${item}</li>`).join('');
-  const interventions = analysis.interventions.map((item) => `<li>${item}</li>`).join('');
+  const drivers = analysis.explainability.keyDrivers.map((item) => `<li>${esc(item.label)}: ${esc(item.valueLabel)} (+${esc(item.score)})</li>`).join('');
+  const flags = analysis.riskFlags.map((item) => `<li>${esc(item)}</li>`).join('');
+  const interventions = analysis.interventions.map((item) => `<li>${esc(item)}</li>`).join('');
 
   return `
     <html>
@@ -106,9 +109,9 @@ export function buildPrintableHtml(state, analysis, translate) {
       </head>
       <body>
         <h1>${APP_VERSION}</h1>
-        <p class="muted">${translate('traceability.caseId')}: ${state.patientCase.caseId}</p>
-        <p class="muted">${translate('savedCases.patientLabel')}: ${state.patientCase.pseudonymizedPatientLabel || translate('common.none')}</p>
-        <p class="muted">${translate('exports.timestamp')}: ${analysis.traceability.timestamp}</p>
+        <p class="muted">${translate('traceability.caseId')}: ${esc(state.patientCase.caseId)}</p>
+        <p class="muted">${translate('savedCases.patientLabel')}: ${esc(state.patientCase.pseudonymizedPatientLabel || translate('common.none'))}</p>
+        <p class="muted">${translate('exports.timestamp')}: ${esc(analysis.traceability.timestamp)}</p>
         <div class="panel">
           <h2>${translate('exports.summaryTitle')}</h2>
           <p>${analysis.priorityLabel}</p>

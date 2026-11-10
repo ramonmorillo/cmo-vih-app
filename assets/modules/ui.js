@@ -54,7 +54,7 @@ function renderFieldCard(field, fieldState) {
         ${optionHtml(field, fieldState.value)}
       </select>
       ${suggested}
-      <span class="field-card__meta">${t('traceability.source')}: ${fieldState.source || t('common.none')} · ${t('traceability.evidence')}: ${fieldState.evidence || t('common.none')}</span>
+      <span class="field-card__meta">${t('traceability.source')}: ${escapeHtml(fieldState.source || t('common.none'))} · ${t('traceability.evidence')}: ${escapeHtml(fieldState.evidence || t('common.none'))}</span>
     </label>
   `;
 }
@@ -172,7 +172,7 @@ function renderAiPanel(state) {
         <strong>${t(`fields.${fieldId}`)}</strong>
         <span>${displayValue}</span>
         <span class="badge badge--${value.status}">${stateBadge(value.status, t)}</span>
-        <small>${value.evidence || t('common.none')}</small>
+        <small>${escapeHtml(value.evidence || t('common.none'))}</small>
       </div>
     `;
     })

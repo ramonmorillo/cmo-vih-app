@@ -1,5 +1,10 @@
 # CHANGELOG.md
 
+## Sin publicar (rama `claude/zen-pasteur-u8tn7z`) — corrección de seguridad
+
+- **XSS corregido**: la evidencia extraída del texto pegado (`assets/modules/ui.js`) y la etiqueta del paciente en la ventana de impresión (`assets/modules/export-layer.js`) se insertaban como HTML sin escapar. Sin cambios en el modelo clínico, el motor ni las reglas del analizador. Prueba de regresión: `tests/xss-escape.test.js`.
+- Origen: auditoría funcional del ecosistema (hub, `docs/ECOSISTEMA_CMO_AUDIT.md`). La versión se fija en el commit de publicación.
+
 ## 3.1.0 — 2026-10-30
 
 Release (author's decision: minor version bump for the interface change). `package.json` and `cmo-app-meta` 3.0.0 → 3.1.0; `cmo-app-meta`: `status: "released"`, `releaseDate: "2026-10-30"`. Includes both sections below, previously unreleased. CMO scoring logic unchanged. The «CMO-VIH Pro v3 — September 2026» texts in `data/i18n` are unchanged (major version 3).
