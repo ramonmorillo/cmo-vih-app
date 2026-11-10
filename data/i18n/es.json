@@ -266,7 +266,11 @@
     "source": "Fuente de entrada",
     "timestamp": "Marca temporal",
     "copySuccess": "Informe copiado al portapapeles. Ya puede pegarlo en la historia clínica.",
-    "copyError": "No se pudo copiar el informe automáticamente. Selecciónelo y cópielo manualmente."
+    "copyError": "No se pudo copiar el informe automáticamente. Selecciónelo y cópielo manualmente.",
+    "status": "Estado",
+    "final": "Definitivo",
+    "automaticLevel": "Clasificación automática",
+    "overrideLine": "Modificación del clínico: {level}. Motivo: {reason}"
   },
   "settings": {
     "title": "Configuración del flujo",
@@ -369,5 +373,22 @@
     "updateMissing": "Este caso aún no se ha guardado. Utilice primero “Guardar caso” o “Guardar como caso nuevo”.",
     "copySuffix": "copia",
     "copyLabel": "Copia de {caseId}"
+  },
+  "gate": {
+    "unconfirmedBadge": "Propuesta sin confirmar",
+    "notScored": "no puntúa hasta que la confirme",
+    "confirm": "Confirmar",
+    "discard": "Descartar",
+    "unconfirmedNotice": "{count} propuesta(s) del análisis de texto sin confirmar: no puntúan ni se exportan hasta que las confirme o las descarte.",
+    "provisionalTitle": "Resultado provisional",
+    "provisionalDetail": "{missing} variable(s) sin valorar y {unconfirmed} propuesta(s) sin confirmar. Lo que falta no se considera negativo: no puntúa.",
+    "overrideNotApplied": "La modificación del clínico no se aplica: indique una justificación de al menos {min} caracteres.",
+    "overrideLowersAuto": "La modificación disminuye una prioridad automática (regla del modelo): documente una justificación reforzada.",
+    "confirmedToast": "Propuesta confirmada.",
+    "discardedToast": "Propuesta descartada; la variable queda sin valorar.",
+    "importOk": "Datos importados.",
+    "importRejected": "Datos importados. {count} valor(es) no admitidos por el modelo se han descartado: {fields}.",
+    "importNothingValid": "el fichero no contiene valores válidos del modelo.",
+    "importNotJson": "el contenido no es un JSON válido."
   }
 }

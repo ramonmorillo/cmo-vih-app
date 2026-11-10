@@ -1,3 +1,4 @@
+import { isUnconfirmedProposal, sanitizeImportedRecord } from './review-gate.js';
 import { APP_VERSION, FIELD_DEFINITIONS, STORAGE_KEY } from './config.js';
 import {
   buildNewPatientCase,
@@ -71,7 +72,17 @@ export function saveState(state) {
   nextState.patientCase.version = APP_VERSION;
   nextState.patientCase.language = nextState.locale;
   nextState.patientCase.traceability.updatedAt = nextState.patientCase.updatedAt;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState));
+  // Borrador del navegador: sin el texto clínico pegado ni el contenido importado (se conservan solo los datos estructurados).
+  const persisted = cloneState(nextState);
+  persisted.patientCase.narrative = '';
+  persisted.patientCase.importRaw = '';
+  // Los fragmentos de evidencia copiados del texto, el resultado calculado (se recalcula al abrir) y la lista de casos guardados
+  // (se vuelve a leer de su almacén) tampoco se duplican en el borrador.
+  Object.values(persisted.patientCase.fields).forEach((field) => { if (field.source === 'ai') field.evidence = ''; });
+  persisted.analysis = null;
+  persisted.savedCases.items = [];
+  persisted.savedCases.filteredItems = [];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
   return nextState;
 }
 
@@ -246,9 +257,8 @@ function normalizeImportedValue(rawValue) {
 
 export function applyImportedRecord(state, record, source = 'import') {
   let next = cloneState(state);
-  const normalizedRecord = Object.fromEntries(
-    Object.entries(record).map(([key, value]) => [key, normalizeImportedValue(value)])
-  );
+  // Solo variables del modelo con valores admitidos; el texto clínico libre de un fichero no se incorpora.
+  const normalizedRecord = sanitizeImportedRecord(record).clean;
 
   FIELD_DEFINITIONS.forEach((field) => {
     if (normalizedRecord[field.id]) {
@@ -262,15 +272,11 @@ export function applyImportedRecord(state, record, source = 'import') {
     }
   });
 
-  if (normalizedRecord.narrative) {
-    next = updateNarrative(next, normalizedRecord.narrative, source);
-  }
-
   if (normalizedRecord.pseudonymizedPatientLabel) {
     next = updatePatientLabel(next, normalizedRecord.pseudonymizedPatientLabel);
   }
 
-  next.patientCase.importRaw = JSON.stringify(normalizedRecord, null, 2);
+  next.patientCase.importRaw = '';
   next.patientCase.source = source;
   next.patientCase.updatedAt = new Date().toISOString();
   return markCaseDirty(next);
@@ -281,10 +287,24 @@ export function parseJsonImport(text) {
   return Array.isArray(parsed) ? parsed[0] : parsed;
 }
 
+// CSV (RFC 4180): campos entre comillas, comillas dobladas y separadores dentro de las comillas.
+function parseCsvLine(line) {
+  const cells = []; let cell = ''; let quoted = false;
+  for (let i = 0; i < line.length; i += 1) {
+    const ch = line[i];
+    if (quoted) { if (ch === '"' && line[i + 1] === '"') { cell += '"'; i += 1; } else if (ch === '"') quoted = false; else cell += ch; }
+    else if (ch === '"') quoted = true;
+    else if (ch === ',') { cells.push(cell.trim()); cell = ''; }
+    else cell += ch;
+  }
+  cells.push(cell.trim());
+  return cells;
+}
+
 export function parseCsvImport(text) {
   const [headerLine, ...rows] = text.trim().split(/\r?\n/);
-  const headers = headerLine.split(',').map((item) => item.trim());
-  const row = (rows[0] || '').split(',').map((item) => item.trim());
+  const headers = parseCsvLine(headerLine);
+  const row = parseCsvLine(rows[0] || '');
   return headers.reduce((acc, header, index) => {
     acc[header] = row[index] || '';
     return acc;
@@ -293,7 +313,7 @@ export function parseCsvImport(text) {
 
 export function computeCompletion(fields) {
   const total = FIELD_DEFINITIONS.length;
-  const completed = FIELD_DEFINITIONS.filter((field) => fields[field.id]?.value).length;
+  const completed = FIELD_DEFINITIONS.filter((field) => fields[field.id]?.value && !isUnconfirmedProposal(fields[field.id])).length;
   return Math.round((completed / total) * 100);
 }
 

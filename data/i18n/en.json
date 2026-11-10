@@ -266,7 +266,11 @@
     "source": "Input source",
     "timestamp": "Timestamp",
     "copySuccess": "Report copied to clipboard. You can now paste it into the clinical record.",
-    "copyError": "Could not copy the report automatically. Please select and copy it manually."
+    "copyError": "Could not copy the report automatically. Please select and copy it manually.",
+    "status": "Status",
+    "final": "Final",
+    "automaticLevel": "Automatic classification",
+    "overrideLine": "Clinician modification: {level}. Reason: {reason}"
   },
   "settings": {
     "title": "Workflow settings",
@@ -369,5 +373,22 @@
     "updateMissing": "This case has not been saved before. Use “Save case” or “Save as new case” first.",
     "copySuffix": "copy",
     "copyLabel": "Copy of {caseId}"
+  },
+  "gate": {
+    "unconfirmedBadge": "Unconfirmed proposal",
+    "notScored": "not scored until you confirm it",
+    "confirm": "Confirm",
+    "discard": "Discard",
+    "unconfirmedNotice": "{count} unconfirmed text-analysis proposal(s): they are not scored or exported until you confirm or discard them.",
+    "provisionalTitle": "Provisional result",
+    "provisionalDetail": "{missing} variable(s) not assessed and {unconfirmed} unconfirmed proposal(s). Missing data is not treated as negative: it does not score.",
+    "overrideNotApplied": "The clinician modification is not applied: enter a justification of at least {min} characters.",
+    "overrideLowersAuto": "The modification lowers an automatic priority (model rule): document a reinforced justification.",
+    "confirmedToast": "Proposal confirmed.",
+    "discardedToast": "Proposal discarded; the variable is left unassessed.",
+    "importOk": "Data imported.",
+    "importRejected": "Data imported. {count} value(s) not accepted by the model were discarded: {fields}.",
+    "importNothingValid": "the file contains no valid model values.",
+    "importNotJson": "the content is not valid JSON."
   }
 }

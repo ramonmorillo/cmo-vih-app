@@ -7,6 +7,7 @@ This application is designed for privacy-first use and does not require personal
 - Use de-identified or minimally necessary clinical text.
 - Avoid including names, national identifiers, exact addresses, phone numbers, or other direct identifiers.
 - Review exported files before sharing or storing them.
+- Text-analysis proposals only enter the calculation after the professional confirms them. The pasted clinical text is never exported and is not kept in the browser draft (explicitly saved cases are unchanged). A pseudonymized identifier is still personal data.
 
 ## Data handling model
 - The app runs as a static web application.

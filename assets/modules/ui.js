@@ -8,6 +8,7 @@ import {
 import { t } from './i18n.js';
 import { renderFoundationSection } from './foundation-section.js';
 import { computeCompletion } from './data-layer.js';
+import { OVERRIDE_MIN_REASON, isUnconfirmedProposal, unconfirmedFieldIds } from './review-gate.js';
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -44,16 +45,25 @@ function renderFieldCard(field, fieldState) {
   const suggested = fieldState.status === 'review' && fieldState.suggestedValue
     ? `<span class="field-card__meta">${t('traceability.suggestedValue')}: ${t(field.optionLabelKeys[fieldState.suggestedValue]) || fieldState.suggestedValue}</span>`
     : '';
+  const unconfirmed = isUnconfirmedProposal(fieldState);
+  const gate = unconfirmed
+    ? `<span class="field-card__meta field-card__gate" role="status"><strong>${t('gate.unconfirmedBadge')}</strong>: ${t(field.optionLabelKeys[fieldState.value])} · ${t('gate.notScored')}</span>
+      <span class="field-card__actions">
+        <button type="button" class="button-secondary" data-gate-action="confirm" data-field-id="${field.id}">${t('gate.confirm')}</button>
+        <button type="button" class="button-ghost" data-gate-action="discard" data-field-id="${field.id}">${t('gate.discard')}</button>
+      </span>`
+    : '';
   return `
-    <label class="field-card">
+    <label class="field-card${unconfirmed ? ' field-card--unconfirmed' : ''}">
       <span class="field-card__header">
         <span class="field-card__label">${t(field.labelKey)}</span>
-        <span class="badge badge--${fieldState.status}">${stateBadge(fieldState.status, t)}</span>
+        <span class="badge badge--${unconfirmed ? 'review' : fieldState.status}">${unconfirmed ? t('statuses.review') : stateBadge(fieldState.status, t)}</span>
       </span>
       <select data-field-id="${field.id}" class="manual-select">
-        ${optionHtml(field, fieldState.value)}
+        ${optionHtml(field, unconfirmed ? '' : fieldState.value)}
       </select>
       ${suggested}
+      ${gate}
       <span class="field-card__meta">${t('traceability.source')}: ${escapeHtml(fieldState.source || t('common.none'))} · ${t('traceability.evidence')}: ${escapeHtml(fieldState.evidence || t('common.none'))}</span>
     </label>
   `;
@@ -76,11 +86,18 @@ function renderDashboard(analysis) {
     return `<div class="empty-panel">${t('dashboard.empty')}</div>`;
   }
 
+  const review = analysis.review;
+  const banner = review
+    ? `${review.provisional ? `<p class="notice notice--warn" role="status"><strong>${t('gate.provisionalTitle')}.</strong> ${t('gate.provisionalDetail', { missing: review.missing, unconfirmed: review.unconfirmed.length })}</p>` : ''}
+       ${review.overrideNotApplied ? `<p class="notice notice--warn" role="status">${t('gate.overrideNotApplied', { min: OVERRIDE_MIN_REASON })}</p>` : ''}
+       ${review.overrideLowersAutomatic ? `<p class="notice notice--warn" role="status">${t('gate.overrideLowersAuto')}</p>` : ''}`
+    : '';
   return `
+    ${banner}
     <div class="dashboard-grid">
       <article class="metric-card metric-card--accent">
         <span class="metric-card__label">${t('dashboard.cmoLevel')}</span>
-        <strong>${analysis.priorityLabel}</strong>
+        <strong>${analysis.priorityLabel}${analysis.review?.provisional ? ` (${t('gate.provisionalTitle').toLowerCase()})` : ''}</strong>
         <small>${t('dashboard.followUpIntensity')}: ${analysis.followUp}</small>
       </article>
       <article class="metric-card">
@@ -313,7 +330,9 @@ function renderNarrativeStage(state) {
 }
 
 function renderReviewStage(state) {
+  const pendingProposals = unconfirmedFieldIds(state.patientCase).length;
   return `
+    ${pendingProposals ? `<p class="notice notice--warn" role="status">${t('gate.unconfirmedNotice', { count: pendingProposals })}</p>` : ''}
     <div class="layout-grid">
       <section class="column-stack">
         <details class="section-card" open>
@@ -326,7 +345,7 @@ function renderReviewStage(state) {
         <details class="section-card" open>
           <summary>${t('inputs.importSection')}</summary>
           <div class="section-body">
-            <select id="importType">
+            <select id="importType" aria-label="${t('inputs.importSection')}">
               <option value="json" ${state.ui.importType === 'json' ? 'selected' : ''}>JSON</option>
               <option value="csv" ${state.ui.importType === 'csv' ? 'selected' : ''}>CSV</option>
             </select>

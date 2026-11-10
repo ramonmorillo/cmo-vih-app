@@ -1,3 +1,4 @@
+import { isValidFieldValue } from './review-gate.js';
 import { APP_VERSION, FIELD_DEFINITIONS } from './config.js';
 
 export function createEmptyField() {
@@ -103,6 +104,10 @@ export function normalizeFields(fields = {}) {
       ...createEmptyField(),
       ...(fields[field.id] || {})
     };
+    // Un valor que el modelo no admite (estado corrupto o importado) se descarta: antes dejaba la aplicación en blanco.
+    if (normalized[field.id].value && !isValidFieldValue(field.id, normalized[field.id].value)) {
+      normalized[field.id] = { ...createEmptyField(), status: 'missing' };
+    }
   });
   return normalized;
 }
