@@ -1,6 +1,6 @@
 # CHANGELOG.md
 
-## 3.2.0 — sin publicar (rama `claude/zen-pasteur-u8tn7z`)
+## 3.2.0 — 2026-11-11
 
 Puerta de revisión profesional, importación validada y estado provisional. **Sin cambios en el modelo clínico**: `assets/modules/config.js`, `assets/modules/cmo-engine.js` y `assets/modules/ai-module.js` son idénticos byte a byte a la 3.1.0 (huellas SHA-256 en `tests/fixtures/clinical.sha256.json`). El motor recibe una *vista* del caso (`assets/modules/review-gate.js`). La versión y la fecha se fijan en el commit de publicación.
 
