@@ -8,6 +8,9 @@ import {
 import { t } from './i18n.js';
 import { renderFoundationSection } from './foundation-section.js';
 import { computeCompletion } from './data-layer.js';
+import { createReport, reportToText } from '../cmo-ds/cmo-report.js';
+import { buildReportInput, followUpView, interventionItems, interventionStatus, INTERVENTION_STATUS_VALUES, toolVersion } from './report-adapter.js';
+import { OVERRIDE_MIN_REASON, isUnconfirmedProposal, unconfirmedFieldIds } from './review-gate.js';
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -44,17 +47,26 @@ function renderFieldCard(field, fieldState) {
   const suggested = fieldState.status === 'review' && fieldState.suggestedValue
     ? `<span class="field-card__meta">${t('traceability.suggestedValue')}: ${t(field.optionLabelKeys[fieldState.suggestedValue]) || fieldState.suggestedValue}</span>`
     : '';
+  const unconfirmed = isUnconfirmedProposal(fieldState);
+  const gate = unconfirmed
+    ? `<span class="field-card__meta field-card__gate" role="status"><strong>${t('gate.unconfirmedBadge')}</strong>: ${t(field.optionLabelKeys[fieldState.value])} · ${t('gate.notScored')}</span>
+      <span class="field-card__actions">
+        <button type="button" class="button-secondary" data-gate-action="confirm" data-field-id="${field.id}">${t('gate.confirm')}</button>
+        <button type="button" class="button-ghost" data-gate-action="discard" data-field-id="${field.id}">${t('gate.discard')}</button>
+      </span>`
+    : '';
   return `
-    <label class="field-card">
+    <label class="field-card${unconfirmed ? ' field-card--unconfirmed' : ''}">
       <span class="field-card__header">
         <span class="field-card__label">${t(field.labelKey)}</span>
-        <span class="badge badge--${fieldState.status}">${stateBadge(fieldState.status, t)}</span>
+        <span class="badge badge--${unconfirmed ? 'review' : fieldState.status}">${unconfirmed ? t('statuses.review') : stateBadge(fieldState.status, t)}</span>
       </span>
       <select data-field-id="${field.id}" class="manual-select">
-        ${optionHtml(field, fieldState.value)}
+        ${optionHtml(field, unconfirmed ? '' : fieldState.value)}
       </select>
       ${suggested}
-      <span class="field-card__meta">${t('traceability.source')}: ${fieldState.source || t('common.none')} · ${t('traceability.evidence')}: ${fieldState.evidence || t('common.none')}</span>
+      ${gate}
+      <span class="field-card__meta">${t('traceability.source')}: ${escapeHtml(fieldState.source || t('common.none'))} · ${t('traceability.evidence')}: ${escapeHtml(fieldState.evidence || t('common.none'))}</span>
     </label>
   `;
 }
@@ -76,11 +88,18 @@ function renderDashboard(analysis) {
     return `<div class="empty-panel">${t('dashboard.empty')}</div>`;
   }
 
+  const review = analysis.review;
+  const banner = review
+    ? `${review.provisional ? `<p class="notice notice--warn" role="status"><strong>${t('gate.provisionalTitle')}.</strong> ${t('gate.provisionalDetail', { missing: review.missing, unconfirmed: review.unconfirmed.length })}</p>` : ''}
+       ${review.overrideNotApplied ? `<p class="notice notice--warn" role="status">${t('gate.overrideNotApplied', { min: OVERRIDE_MIN_REASON })}</p>` : ''}
+       ${review.overrideLowersAutomatic ? `<p class="notice notice--warn" role="status">${t('gate.overrideLowersAuto')}</p>` : ''}`
+    : '';
   return `
+    ${banner}
     <div class="dashboard-grid">
       <article class="metric-card metric-card--accent">
         <span class="metric-card__label">${t('dashboard.cmoLevel')}</span>
-        <strong>${analysis.priorityLabel}</strong>
+        <strong>${analysis.priorityLabel}${analysis.review?.provisional ? ` (${t('gate.provisionalTitle').toLowerCase()})` : ''}</strong>
         <small>${t('dashboard.followUpIntensity')}: ${analysis.followUp}</small>
       </article>
       <article class="metric-card">
@@ -172,7 +191,7 @@ function renderAiPanel(state) {
         <strong>${t(`fields.${fieldId}`)}</strong>
         <span>${displayValue}</span>
         <span class="badge badge--${value.status}">${stateBadge(value.status, t)}</span>
-        <small>${value.evidence || t('common.none')}</small>
+        <small>${escapeHtml(value.evidence || t('common.none'))}</small>
       </div>
     `;
     })
@@ -222,8 +241,8 @@ function renderSavedCasesList(state) {
 }
 
 const STAGE_FLOWS = {
-  manual: ['intro', 'review', 'stratify', 'savedCases', 'report'],
-  ai: ['intro', 'narrative', 'review', 'stratify', 'savedCases', 'report']
+  manual: ['intro', 'review', 'stratify', 'followUp', 'savedCases', 'report'],
+  ai: ['intro', 'narrative', 'review', 'stratify', 'followUp', 'savedCases', 'report']
 };
 
 const STAGE_LABEL_KEYS = {
@@ -231,6 +250,7 @@ const STAGE_LABEL_KEYS = {
   narrative: 'wizard.stageNarrative',
   review: 'wizard.stageReview',
   stratify: 'wizard.stageStratify',
+  followUp: 'wizard.stageFollowUp',
   savedCases: 'wizard.stageSavedCases',
   report: 'wizard.stageReport'
 };
@@ -313,7 +333,9 @@ function renderNarrativeStage(state) {
 }
 
 function renderReviewStage(state) {
+  const pendingProposals = unconfirmedFieldIds(state.patientCase).length;
   return `
+    ${pendingProposals ? `<p class="notice notice--warn" role="status">${t('gate.unconfirmedNotice', { count: pendingProposals })}</p>` : ''}
     <div class="layout-grid">
       <section class="column-stack">
         <details class="section-card" open>
@@ -326,7 +348,7 @@ function renderReviewStage(state) {
         <details class="section-card" open>
           <summary>${t('inputs.importSection')}</summary>
           <div class="section-body">
-            <select id="importType">
+            <select id="importType" aria-label="${t('inputs.importSection')}">
               <option value="json" ${state.ui.importType === 'json' ? 'selected' : ''}>JSON</option>
               <option value="csv" ${state.ui.importType === 'csv' ? 'selected' : ''}>CSV</option>
             </select>
@@ -404,7 +426,7 @@ function renderStratifyStage(state, analysis) {
       </section>
     </div>
     <div class="button-row button-row--wrap">
-      <button type="button" id="continueToSavedCasesBtn">${t('wizard.continueToSavedCases')}</button>
+      <button type="button" id="continueToFollowUpBtn">${t('wizard.continueToFollowUp')}</button>
     </div>
   `;
 }
@@ -428,8 +450,10 @@ function renderReportStage(state, analysis) {
         <button id="jsonExportBtn" class="button-secondary">${t('buttons.exportJson')}</button>
         <button id="csvExportBtn" class="button-secondary">${t('buttons.exportCsv')}</button>
         <button id="printBtn" class="button-secondary">${t('buttons.print')}</button>
+        <button id="pdfBtn" class="button-secondary">${t('buttons.downloadPdf')}</button>
+        <button id="textBtn" class="button-secondary">${t('buttons.downloadText')}</button>
       </div>
-      <pre class="report-box">${analysis ? `${t('exports.summaryTitle')}: ${analysis.priorityLabel}\n${t('exports.totalScore')}: ${analysis.total}\n${t('exports.followUp')}: ${analysis.followUp}\n${t('exports.riskFlags')}: ${analysis.riskFlags.join(', ') || t('common.none')}` : t('exports.pending')}</pre>
+      <pre class="report-box" tabindex="0" aria-label="${t('exports.preview')}">${analysis ? escapeHtml(reportToText(createReport(buildReportInput(state, analysis, t, { version: toolVersion() })))) : t('exports.pending')}</pre>
     </details>
 
     <div class="summary-panel-bottom">
@@ -458,6 +482,45 @@ function renderReportStage(state, analysis) {
   `;
 }
 
+
+function renderFollowUpStage(state, analysis) {
+  const view = followUpView(state, analysis);
+  const items = interventionItems(analysis, t);
+  const plan = state.patientCase.plan || {};
+  return `
+    <section class="dashboard-section">
+      <h2>${t('followUp.title')}</h2>
+      <p class="supporting-text">${t('followUp.lead')}</p>
+      <div class="panel-grid panel-grid--two">
+        <article class="panel-card">
+          <h3>${t('followUp.contrib')}</h3>
+          ${view.bySection.map((group) => `<h4>${t(SECTION_LABEL_KEYS[group.section])}</h4><ul>${group.items.map((c) => `<li>${escapeHtml(c.label)}: ${escapeHtml(c.valueLabel)} (+${c.score})</li>`).join('') || `<li>${t('followUp.none')}</li>`}</ul>`).join('')}
+        </article>
+        <article class="panel-card">
+          <h3>${t('followUp.pending')}</h3>
+          <ul>${view.pending.map((f) => `<li>${t(f.labelKey)}${f.unconfirmed ? ` <span class="badge badge--review">${t('followUp.pendingUnconfirmed')}</span>` : ''}</li>`).join('') || `<li>${t('followUp.none')}</li>`}</ul>
+        </article>
+      </div>
+      <article class="panel-card">
+        <h3>${t('followUp.interventions')}</h3>
+        <ul class="intervention-list">
+          ${items.map((item, index) => `<li><span id="int-${index}">${escapeHtml(item.label)}</span>
+            <select data-intervention-id="${item.id}" aria-labelledby="int-${index}">${INTERVENTION_STATUS_VALUES.map((value) => `<option value="${value}" ${interventionStatus(state.patientCase, item.id) === value ? 'selected' : ''}>${t(`followUp.status.${value}`)}</option>`).join('')}</select></li>`).join('')}
+        </ul>
+      </article>
+      <article class="panel-card">
+        <h3>${t('followUp.plan')}</h3>
+        <p>${escapeHtml(analysis.followUp)}</p>
+        <label>${t('followUp.nextReview')}<input type="date" id="planNextReview" value="${escapeHtml(plan.nextReview || '')}"></label>
+        <label>${t('followUp.notes')}<textarea id="planNotes" maxlength="2000">${escapeHtml(plan.notes || '')}</textarea></label>
+      </article>
+    </section>
+    <div class="button-row button-row--wrap">
+      <button type="button" id="continueToSavedCasesBtn">${t('wizard.continueToSavedCases')}</button>
+    </div>
+  `;
+}
+
 function renderStage(wizard, state, analysis) {
   switch (wizard.stage) {
     case 'narrative':
@@ -466,6 +529,8 @@ function renderStage(wizard, state, analysis) {
       return renderReviewStage(state);
     case 'stratify':
       return renderStratifyStage(state, analysis);
+    case 'followUp':
+      return renderFollowUpStage(state, analysis);
     case 'savedCases':
       return renderSavedCasesStage(state);
     case 'report':

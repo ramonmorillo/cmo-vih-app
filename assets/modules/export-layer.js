@@ -1,4 +1,16 @@
 import { APP_VERSION } from './config.js';
+import { isUnconfirmedProposal, reviewLines } from './review-gate.js';
+
+export const EXPORT_SCHEMA = 'cmo-vih-export/1';
+// Una celda que empieza por = + - @ se neutraliza para que una hoja de cálculo no la ejecute como fórmula.
+const csvCell = (value) => {
+  let text = String(value ?? '');
+  if (/^[=+\-@\t\r]/.test(text)) text = `'${text}`;
+  return `"${text.replaceAll('"', '""')}"`;
+};
+
+// Campos exportables: una propuesta sin confirmar no se exporta (ni su valor ni el fragmento de texto que la originó).
+const exportableFields = (patientCase) => Object.fromEntries(Object.entries(patientCase.fields).map(([id, field]) => [id, isUnconfirmedProposal(field) ? { ...field, value: '', status: 'missing', evidence: '', suggestedValue: '' } : field]));
 
 export function buildClinicalSummary(state, analysis, translate) {
   return [
@@ -10,12 +22,14 @@ export function buildClinicalSummary(state, analysis, translate) {
     `${translate('exports.keyDrivers')}: ${analysis.explainability.keyDrivers.map((item) => item.label).join(', ') || translate('common.none')}`,
     `${translate('exports.riskFlags')}: ${analysis.riskFlags.join(', ') || translate('common.none')}`,
     `${translate('exports.source')}: ${analysis.traceability.inputSource}`,
-    `${translate('exports.timestamp')}: ${analysis.traceability.timestamp}`
+    `${translate('exports.timestamp')}: ${analysis.traceability.timestamp}`,
+    ...reviewLines(state.patientCase, analysis, translate)
   ].join('\n');
 }
 
 export function buildStructuredReport(state, analysis, translate) {
   return {
+    schema: EXPORT_SCHEMA,
     version: APP_VERSION,
     locale: state.locale,
     caseId: state.patientCase.caseId,
@@ -25,7 +39,9 @@ export function buildStructuredReport(state, analysis, translate) {
     storageRecommendation: translate('savedCases.helperStorage', { storage: translate(`savedCases.storageMode.${state.savedCases.storageMode}`) }),
     clinician: state.patientCase.clinician,
     traceability: analysis.traceability,
-    narrative: state.patientCase.narrative,
+    // El texto clínico pegado no se exporta: solo datos estructurados confirmados.
+    status: analysis.review?.provisional ? 'provisional' : 'final',
+    review: analysis.review ? { pendingVariables: analysis.review.missing, unconfirmedProposals: analysis.review.unconfirmed } : null,
     override: state.patientCase.override,
     analysis: {
       total: analysis.total,
@@ -38,7 +54,7 @@ export function buildStructuredReport(state, analysis, translate) {
       interventions: analysis.interventions,
       explainability: analysis.explainability
     },
-    fields: state.patientCase.fields
+    fields: exportableFields(state.patientCase)
   };
 }
 
@@ -59,6 +75,7 @@ export function buildClinicalRecordText(state, analysis, translate) {
     '',
     `${analysis.priorityLabel} (${translate('exports.totalScore')}: ${analysis.total})`,
     `${translate('exports.followUp')}: ${analysis.followUp}`,
+    ...reviewLines(state.patientCase, analysis, translate),
     '',
     `${translate('exports.keyDrivers')}:`,
     drivers,
@@ -73,7 +90,8 @@ export function buildClinicalRecordText(state, analysis, translate) {
 }
 
 export function buildCsvExport(state, analysis) {
-  const headers = ['version', 'caseId', 'patientLabel', 'timestamp', 'source', 'finalLevel', 'totalScore', 'followUp', 'riskFlags'];
+  const headers = ['version', 'caseId', 'patientLabel', 'timestamp', 'source', 'finalLevel', 'totalScore', 'followUp', 'riskFlags', 'status', 'automaticLevel', 'overrideLevel', 'overrideReason', 'pendingVariables', 'unconfirmedProposals'];
+  const review = analysis.review;
   const row = [
     APP_VERSION,
     state.patientCase.caseId,
@@ -83,15 +101,23 @@ export function buildCsvExport(state, analysis) {
     analysis.finalLevel,
     analysis.total,
     analysis.followUp,
-    analysis.riskFlags.join('; ')
+    analysis.riskFlags.join('; '),
+    review?.provisional ? 'provisional' : 'final',
+    analysis.automaticLevel,
+    review?.overrideApplied ? analysis.finalLevel : '',
+    review?.overrideApplied ? String(state.patientCase.override.reason).trim() : '',
+    review?.missing ?? '',
+    review?.unconfirmed.length ?? ''
   ];
-  return `${headers.join(',')}\n${row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(',')}`;
+  return `${headers.join(',')}\n${row.map(csvCell).join(',')}`;
 }
 
+const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
 export function buildPrintableHtml(state, analysis, translate) {
-  const drivers = analysis.explainability.keyDrivers.map((item) => `<li>${item.label}: ${item.valueLabel} (+${item.score})</li>`).join('');
-  const flags = analysis.riskFlags.map((item) => `<li>${item}</li>`).join('');
-  const interventions = analysis.interventions.map((item) => `<li>${item}</li>`).join('');
+  const drivers = analysis.explainability.keyDrivers.map((item) => `<li>${esc(item.label)}: ${esc(item.valueLabel)} (+${esc(item.score)})</li>`).join('');
+  const flags = analysis.riskFlags.map((item) => `<li>${esc(item)}</li>`).join('');
+  const interventions = analysis.interventions.map((item) => `<li>${esc(item)}</li>`).join('');
 
   return `
     <html>
@@ -106,9 +132,10 @@ export function buildPrintableHtml(state, analysis, translate) {
       </head>
       <body>
         <h1>${APP_VERSION}</h1>
-        <p class="muted">${translate('traceability.caseId')}: ${state.patientCase.caseId}</p>
-        <p class="muted">${translate('savedCases.patientLabel')}: ${state.patientCase.pseudonymizedPatientLabel || translate('common.none')}</p>
-        <p class="muted">${translate('exports.timestamp')}: ${analysis.traceability.timestamp}</p>
+        <p class="muted">${translate('traceability.caseId')}: ${esc(state.patientCase.caseId)}</p>
+        <p class="muted">${translate('savedCases.patientLabel')}: ${esc(state.patientCase.pseudonymizedPatientLabel || translate('common.none'))}</p>
+        <p class="muted">${translate('exports.timestamp')}: ${esc(analysis.traceability.timestamp)}</p>
+        ${reviewLines(state.patientCase, analysis, translate).map((line) => `<p class="muted">${esc(line)}</p>`).join('')}
         <div class="panel">
           <h2>${translate('exports.summaryTitle')}</h2>
           <p>${analysis.priorityLabel}</p>

@@ -1,6 +1,11 @@
 import { APP_VERSION, EXAMPLE_CASE, FIELD_DEFINITIONS } from './modules/config.js';
 import { extractFromNarrative } from './modules/ai-module.js';
 import { evaluateCase } from './modules/cmo-engine.js';
+import { reviewSummary, sanitizeImportedRecord, scoringView } from './modules/review-gate.js';
+import { createReport, reportToText, reportToHtml } from './cmo-ds/cmo-report.js';
+import { reportToPdf } from './cmo-ds/cmo-pdf.js';
+import { copyText, download, guardUnsaved, printHtml, safeFilename, toast } from './cmo-ds/cmo-flow.js';
+import { buildReportInput, toolVersion } from './modules/report-adapter.js';
 import {
   applyImportedRecord,
   createDefaultState,
@@ -12,7 +17,9 @@ import {
   parseJsonImport,
   resetCase,
   saveState,
+  setInterventionStatus,
   setNewCaseModal,
+  setPlan,
   setOverride,
   setSavedCases,
   setWizardMode,
@@ -34,10 +41,7 @@ import {
   upsertSavedCase
 } from './modules/case-storage.js';
 import {
-  buildClinicalRecordText,
-  buildClinicalSummary,
   buildCsvExport,
-  buildPrintableHtml,
   buildStructuredReport,
   downloadBlob
 } from './modules/export-layer.js';
@@ -50,7 +54,9 @@ function recomputeAnalysis() {
   state.patientCase.toolVersion = APP_VERSION;
   state.patientCase.version = APP_VERSION;
   state.patientCase.language = state.locale;
-  state.analysis = evaluateCase(state.patientCase, t);
+  // El motor puntúa solo lo confirmado por el profesional (ver modules/review-gate.js).
+  state.analysis = evaluateCase(scoringView(state.patientCase), t);
+  state.analysis.review = reviewSummary(state.patientCase, state.analysis);
 }
 
 function render() {
@@ -107,8 +113,9 @@ function chooseMode(mode) {
 }
 
 function handleNarrativeChange(event) {
+  // Sin volver a dibujar: el re-render sustituía el botón «Analizar» y el primer clic se perdía.
   state = updateNarrative(state, event.target.value, 'text');
-  persistAndRender();
+  state = saveState(state);
 }
 
 function handlePatientLabelChange(event) {
@@ -147,7 +154,20 @@ function handleAnalyzeText() {
 
   state = setWizardStage(state, 'review');
   persistAndRender();
-  window.alert(`${t('ai.analysisComplete')}\n\n${summary}`);
+  toast(`${t('ai.analysisComplete')} ${summary.split('\n')[0]}`);
+}
+
+function handleGateAction(event) {
+  const { fieldId, gateAction } = event.currentTarget.dataset;
+  if (!state.patientCase.fields[fieldId]) return;
+  if (gateAction === 'confirm') {
+    state = updateField(state, fieldId, { clinicianConfirmed: true, status: 'confirmed' });
+    toast(t('gate.confirmedToast'));
+  } else {
+    state = updateField(state, fieldId, { value: '', status: 'missing', source: 'manual', evidence: '', suggestedValue: '', needsReview: false, clinicianConfirmed: false });
+    toast(t('gate.discardedToast'));
+  }
+  persistAndRender();
 }
 
 function handleLoadExample() {
@@ -159,16 +179,22 @@ function handleImport() {
   const importType = document.getElementById('importType').value;
   const raw = document.getElementById('importInput').value.trim();
   if (!raw) {
-    window.alert(t('inputs.importEmpty'));
+    toast(t('inputs.importEmpty'), { type: 'warn' });
     return;
   }
   try {
     const record = importType === 'json' ? parseJsonImport(raw) : parseCsvImport(raw);
-    state = applyImportedRecord(state, record, 'import');
+    const { clean, rejected } = sanitizeImportedRecord(record);
+    if (!Object.keys(clean).length) {
+      toast(`${t('inputs.importError')}: ${t('gate.importNothingValid')}`, { type: 'error' });
+      return;
+    }
+    state = applyImportedRecord(state, clean, 'import');
     state = updateUi(state, { importType });
     persistAndRender();
+    toast(rejected.length ? t('gate.importRejected', { count: rejected.length, fields: rejected.join(', ') }) : t('gate.importOk'), { type: rejected.length ? 'warn' : 'info' });
   } catch (error) {
-    window.alert(`${t('inputs.importError')}: ${error.message}`);
+    toast(`${t('inputs.importError')}: ${error instanceof SyntaxError ? t('gate.importNotJson') : error.message}`, { type: 'error' });
   }
 }
 
@@ -207,7 +233,7 @@ async function saveCurrentCase({ asNew = false, forceUpdate = false } = {}) {
   const existingSavedCase = state.savedCases.items.find((item) => item.caseId === state.patientCase.caseId);
 
   if (forceUpdate && !existingSavedCase) {
-    window.alert(t('savedCases.updateMissing'));
+    toast(t('savedCases.updateMissing'));
     return;
   }
 
@@ -225,7 +251,7 @@ async function saveCurrentCase({ asNew = false, forceUpdate = false } = {}) {
   state = saveState(state);
   await refreshSavedCases();
   render();
-  window.alert(existingSavedCase && !asNew ? t('savedCases.updatedMessage', { caseId: record.caseId }) : t('savedCases.savedMessage', { caseId: record.caseId }));
+  toast(existingSavedCase && !asNew ? t('savedCases.updatedMessage', { caseId: record.caseId }) : t('savedCases.savedMessage', { caseId: record.caseId }));
 }
 
 async function startFreshCase(shouldSaveCurrentCase) {
@@ -243,7 +269,7 @@ async function startFreshCase(shouldSaveCurrentCase) {
   render();
 
   if (savedCaseId) {
-    window.alert(t('newCase.savedMessage', { id: savedCaseId }));
+    toast(t('newCase.savedMessage', { id: savedCaseId }));
   }
 }
 
@@ -257,40 +283,26 @@ function handleNewCaseClick() {
   startFreshCase(false);
 }
 
+// Informe único (cmo-report/1): el texto, la copia, la impresión y el PDF se generan de la misma estructura y en el idioma de la interfaz.
+const currentReport = () => createReport(buildReportInput(state, state.analysis, t, { version: toolVersion() }));
+const reportFile = (ext) => `${safeFilename('cmo-vih', state.patientCase.pseudonymizedPatientLabel || 'caso', state.patientCase.caseId)}.${ext}`;
+
 function exportSummary() {
   if (!state.analysis) return;
-  downloadBlob('cmo-vih-summary.txt', buildClinicalSummary(state, state.analysis, t));
+  download(reportFile('txt'), reportToText(currentReport()));
+  toast(t('exports.textDone'));
 }
 
-function copyTextToClipboardFallback(text) {
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  textarea.setAttribute('readonly', '');
-  textarea.style.position = 'fixed';
-  textarea.style.left = '-9999px';
-  document.body.appendChild(textarea);
-  textarea.select();
-  const succeeded = document.execCommand('copy');
-  document.body.removeChild(textarea);
-  if (!succeeded) {
-    throw new Error('execCommand copy failed');
-  }
+function exportPdf() {
+  if (!state.analysis) return;
+  download(reportFile('pdf'), reportToPdf(currentReport()), 'application/pdf');
+  toast(t('exports.pdfDone'));
 }
 
 async function copyToClinicalRecord() {
   if (!state.analysis) return;
-  const text = buildClinicalRecordText(state, state.analysis, t);
-
-  try {
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(text);
-    } else {
-      copyTextToClipboardFallback(text);
-    }
-    window.alert(t('exports.copySuccess'));
-  } catch (error) {
-    window.alert(t('exports.copyError'));
-  }
+  const ok = await copyText(reportToText(currentReport()));
+  toast(ok ? t('exports.copySuccess') : t('exports.copyError'), { type: ok ? 'info' : 'error' });
 }
 
 function exportJson() {
@@ -305,11 +317,19 @@ function exportCsv() {
 
 function printReport() {
   if (!state.analysis) return;
-  const popup = window.open('', '_blank', 'width=960,height=720');
-  popup.document.write(buildPrintableHtml(state, state.analysis, t));
-  popup.document.close();
-  popup.focus();
-  popup.print();
+  const report = currentReport();
+  printHtml(reportToHtml(report), report.title, state.locale);
+}
+
+function handleInterventionStatus(event) {
+  state = setInterventionStatus(state, event.target.dataset.interventionId, event.target.value);
+  persistAndRender();
+}
+
+function handlePlanChange(event) {
+  // Sin volver a dibujar: el re-render quitaría el foco del campo.
+  state = setPlan(state, { [event.target.id === 'planNextReview' ? 'nextReview' : 'notes']: event.target.value });
+  state = saveState(state);
 }
 
 async function handleSavedCaseAction(event) {
@@ -337,7 +357,7 @@ async function handleSavedCaseAction(event) {
 
   const record = await getSavedCase(caseId);
   if (!record) {
-    window.alert(t('savedCases.notFound', { caseId }));
+    toast(t('savedCases.notFound', { caseId }));
     return;
   }
 
@@ -383,7 +403,7 @@ async function handleSavedCaseAction(event) {
     await upsertSavedCase(duplicateRecord);
     await refreshSavedCases();
     render();
-    window.alert(t('savedCases.duplicatedMessage', { caseId: duplicateRecord.caseId }));
+    toast(t('savedCases.duplicatedMessage', { caseId: duplicateRecord.caseId }));
     return;
   }
 
@@ -422,6 +442,12 @@ function bindEvents() {
   document.getElementById('jsonExportBtn')?.addEventListener('click', exportJson);
   document.getElementById('csvExportBtn')?.addEventListener('click', exportCsv);
   document.getElementById('printBtn')?.addEventListener('click', printReport);
+  document.getElementById('pdfBtn')?.addEventListener('click', exportPdf);
+  document.getElementById('textBtn')?.addEventListener('click', exportSummary);
+  document.querySelectorAll('[data-intervention-id]').forEach((element) => element.addEventListener('change', handleInterventionStatus));
+  document.getElementById('planNextReview')?.addEventListener('change', handlePlanChange);
+  document.getElementById('planNotes')?.addEventListener('change', handlePlanChange);
+  document.getElementById('continueToFollowUpBtn')?.addEventListener('click', () => goToStage('followUp'));
   document.getElementById('toolbarExportBtn')?.addEventListener('click', exportJson);
   document.getElementById('newCaseBtn')?.addEventListener('click', handleNewCaseClick);
   document.getElementById('toolbarSaveBtn')?.addEventListener('click', () => saveCurrentCase());
@@ -452,6 +478,7 @@ function bindEvents() {
   document.getElementById('toggleSavedCasesBtn')?.addEventListener('click', () => goToStage('savedCases'));
   document.querySelector('.saved-cases-list')?.addEventListener('click', handleSavedCaseAction);
 
+  document.querySelectorAll('[data-gate-action]').forEach((element) => element.addEventListener('click', handleGateAction));
   document.getElementById('manualRouteBtn')?.addEventListener('click', () => chooseMode('manual'));
   document.getElementById('assistedRouteBtn')?.addEventListener('click', () => chooseMode('ai'));
   document.getElementById('skipToReviewBtn')?.addEventListener('click', () => goToStage('review'));
@@ -477,4 +504,5 @@ async function init() {
   render();
 }
 
+guardUnsaved(() => Boolean(state.ui?.unsavedChanges) && hasCaseData(state.patientCase));
 init();

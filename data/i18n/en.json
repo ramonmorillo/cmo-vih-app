@@ -24,7 +24,9 @@
     "continueToStratify": "Continue to stratification",
     "continueToSavedCases": "Continue to saved cases",
     "continueToReport": "Continue to report",
-    "skipToReview": "Skip and go to variable review"
+    "skipToReview": "Skip and go to variable review",
+    "stageFollowUp": "Follow-up",
+    "continueToFollowUp": "Continue to needs and interventions"
   },
   "common": {
     "none": "None",
@@ -46,7 +48,9 @@
     "newCase": "New patient / New case",
     "save": "Save",
     "savedCases": "Saved cases",
-    "export": "Export"
+    "export": "Export",
+    "downloadPdf": "Download PDF",
+    "downloadText": "Download text (.txt)"
   },
   "progress": {
     "title": "Workflow completion",
@@ -266,7 +270,15 @@
     "source": "Input source",
     "timestamp": "Timestamp",
     "copySuccess": "Report copied to clipboard. You can now paste it into the clinical record.",
-    "copyError": "Could not copy the report automatically. Please select and copy it manually."
+    "copyError": "Could not copy the report automatically. Please select and copy it manually.",
+    "status": "Status",
+    "final": "Final",
+    "automaticLevel": "Automatic classification",
+    "overrideLine": "Clinician modification: {level}. Reason: {reason}",
+    "pdfDone": "PDF generated.",
+    "textDone": "Text downloaded.",
+    "blockedTitle": "Report available",
+    "preview": "Text for the clinical record"
   },
   "settings": {
     "title": "Workflow settings",
@@ -369,5 +381,40 @@
     "updateMissing": "This case has not been saved before. Use “Save case” or “Save as new case” first.",
     "copySuffix": "copy",
     "copyLabel": "Copy of {caseId}"
+  },
+  "gate": {
+    "unconfirmedBadge": "Unconfirmed proposal",
+    "notScored": "not scored until you confirm it",
+    "confirm": "Confirm",
+    "discard": "Discard",
+    "unconfirmedNotice": "{count} unconfirmed text-analysis proposal(s): they are not scored or exported until you confirm or discard them.",
+    "provisionalTitle": "Provisional result",
+    "provisionalDetail": "{missing} variable(s) not assessed and {unconfirmed} unconfirmed proposal(s). Missing data is not treated as negative: it does not score.",
+    "overrideNotApplied": "The clinician modification is not applied: enter a justification of at least {min} characters.",
+    "overrideLowersAuto": "The modification lowers an automatic priority (model rule): document a reinforced justification.",
+    "confirmedToast": "Proposal confirmed.",
+    "discardedToast": "Proposal discarded; the variable is left unassessed.",
+    "importOk": "Data imported.",
+    "importRejected": "Data imported. {count} value(s) not accepted by the model were discarded: {fields}.",
+    "importNothingValid": "the file contains no valid model values.",
+    "importNotJson": "the content is not valid JSON."
+  },
+  "followUp": {
+    "title": "Needs, interventions and follow-up",
+    "lead": "Variables that score, by model section, and pending data. Record the status of each model intervention and the follow-up plan.",
+    "contrib": "Variables that score",
+    "none": "None",
+    "pending": "Pending assessment (potential)",
+    "pendingUnconfirmed": "unconfirmed proposal",
+    "interventions": "Model interventions",
+    "plan": "Follow-up plan",
+    "nextReview": "Next planned assessment",
+    "notes": "Notes and agreements",
+    "status": {
+      "recommended": "Recommended by the model (not recorded)",
+      "done": "Done",
+      "planned": "Planned",
+      "not_applicable": "Not applicable"
+    }
   }
 }

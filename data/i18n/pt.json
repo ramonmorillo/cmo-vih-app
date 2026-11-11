@@ -24,7 +24,9 @@
     "continueToStratify": "Continuar para a estratificação",
     "continueToSavedCases": "Continuar para os casos salvos",
     "continueToReport": "Continuar para o relatório",
-    "skipToReview": "Pular e ir para a revisão de variáveis"
+    "skipToReview": "Pular e ir para a revisão de variáveis",
+    "stageFollowUp": "Seguimento",
+    "continueToFollowUp": "Continuar para necessidades e intervenções"
   },
   "common": {
     "none": "Nenhum",
@@ -46,7 +48,9 @@
     "newCase": "Novo paciente / Novo caso",
     "save": "Salvar",
     "savedCases": "Casos salvos",
-    "export": "Exportar"
+    "export": "Exportar",
+    "downloadPdf": "Descarregar PDF",
+    "downloadText": "Descarregar texto (.txt)"
   },
   "progress": {
     "title": "Conclusão do fluxo de trabalho",
@@ -266,7 +270,15 @@
     "source": "Fonte de entrada",
     "timestamp": "Carimbo de data/hora",
     "copySuccess": "Relatório copiado para a área de transferência. Agora você pode colá-lo no prontuário.",
-    "copyError": "Não foi possível copiar o relatório automaticamente. Selecione-o e copie manualmente."
+    "copyError": "Não foi possível copiar o relatório automaticamente. Selecione-o e copie manualmente.",
+    "status": "Estado",
+    "final": "Definitivo",
+    "automaticLevel": "Classificação automática",
+    "overrideLine": "Modificação do clínico: {level}. Motivo: {reason}",
+    "pdfDone": "PDF gerado.",
+    "textDone": "Texto descarregado.",
+    "blockedTitle": "Relatório disponível",
+    "preview": "Texto para o processo clínico"
   },
   "settings": {
     "title": "Configurações do fluxo de trabalho",
@@ -369,5 +381,40 @@
     "updateMissing": "Este caso ainda não foi salvo. Use \"Salvar caso\" ou \"Salvar como novo caso\" primeiro.",
     "copySuffix": "cópia",
     "copyLabel": "Cópia de {caseId}"
+  },
+  "gate": {
+    "unconfirmedBadge": "Proposta por confirmar",
+    "notScored": "não pontua até ser confirmada",
+    "confirm": "Confirmar",
+    "discard": "Descartar",
+    "unconfirmedNotice": "{count} proposta(s) da análise de texto por confirmar: não pontuam nem são exportadas até as confirmar ou descartar.",
+    "provisionalTitle": "Resultado provisório",
+    "provisionalDetail": "{missing} variável(eis) por avaliar e {unconfirmed} proposta(s) por confirmar. O que falta não é considerado negativo: não pontua.",
+    "overrideNotApplied": "A modificação do clínico não é aplicada: indique uma justificação com pelo menos {min} caracteres.",
+    "overrideLowersAuto": "A modificação reduz uma prioridade automática (regra do modelo): documente uma justificação reforçada.",
+    "confirmedToast": "Proposta confirmada.",
+    "discardedToast": "Proposta descartada; a variável fica por avaliar.",
+    "importOk": "Dados importados.",
+    "importRejected": "Dados importados. {count} valor(es) não aceites pelo modelo foram descartados: {fields}.",
+    "importNothingValid": "o ficheiro não contém valores válidos do modelo.",
+    "importNotJson": "o conteúdo não é um JSON válido."
+  },
+  "followUp": {
+    "title": "Necessidades, intervenções e seguimento",
+    "lead": "Variáveis que pontuam, por secção do modelo, e dados pendentes. Registe o estado de cada intervenção do modelo e o plano de seguimento.",
+    "contrib": "Variáveis que pontuam",
+    "none": "Nenhuma",
+    "pending": "Por avaliar (potenciais)",
+    "pendingUnconfirmed": "proposta por confirmar",
+    "interventions": "Intervenções do modelo",
+    "plan": "Plano de seguimento",
+    "nextReview": "Próxima avaliação prevista",
+    "notes": "Observações e acordos",
+    "status": {
+      "recommended": "Recomendada pelo modelo (sem registo)",
+      "done": "Realizada",
+      "planned": "Planeada",
+      "not_applicable": "Não se aplica"
+    }
   }
 }

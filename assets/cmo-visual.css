@@ -54,3 +54,12 @@ details.section-card summary { font-family: var(--cmo-font-serif); font-weight: 
 /* Botón principal sólido de marca (sin el degradado heredado) */
 .button-primary, button:not([class]) { background: var(--cmo-brand-strong); }
 .button-primary:hover, button:not([class]):hover { background: var(--cmo-ink); }
+
+/* Puerta de revisión profesional (núcleo 0.3.0): propuestas sin confirmar, avisos y confirmaciones. */
+.field-card--unconfirmed { border-color: var(--cmo-warn); background: var(--cmo-warn-bg); }
+.field-card__gate { color: var(--cmo-ink); }
+.field-card__actions { display: flex; flex-wrap: wrap; gap: var(--cmo-space-2); margin-top: var(--cmo-space-2); }
+.field-card__actions button { min-height: 44px; }
+.notice--warn { padding: var(--cmo-space-3) var(--cmo-space-4); border: 1px solid var(--cmo-warn); border-left-width: 4px; border-radius: var(--cmo-radius-sm); background: var(--cmo-warn-bg); color: var(--cmo-ink); }
+.cmo-modal button.cmo-btn--secondary { background: var(--cmo-surface); color: var(--cmo-brand-strong); border: 1px solid var(--cmo-brand-strong); }
+.cmo-modal button.cmo-btn--danger { background: var(--cmo-error); color: #fff; }

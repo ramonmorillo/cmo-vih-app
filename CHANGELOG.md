@@ -1,5 +1,39 @@
 # CHANGELOG.md
 
+## 3.2.0 — sin publicar (rama `claude/zen-pasteur-u8tn7z`)
+
+Puerta de revisión profesional, importación validada y estado provisional. **Sin cambios en el modelo clínico**: `assets/modules/config.js`, `assets/modules/cmo-engine.js` y `assets/modules/ai-module.js` son idénticos byte a byte a la 3.1.0 (huellas SHA-256 en `tests/fixtures/clinical.sha256.json`). El motor recibe una *vista* del caso (`assets/modules/review-gate.js`). La versión y la fecha se fijan en el commit de publicación.
+
+### Revisión profesional (cambio de comportamiento: requiere validación del autor)
+- **Las propuestas del análisis de texto ya no puntúan hasta que el profesional las confirma** (antes puntuaban de inmediato con `clinicianConfirmed: false`: «Antecedente de deterioro cognitivo no confirmado» sumaba +2 y generaba una alerta). Cada propuesta muestra «Confirmar» y «Descartar»; una propuesta sin confirmar tampoco activa la prioridad automática, no genera alertas, no cuenta en el progreso y no se exporta (ni su valor ni el fragmento de texto).
+- **Resultado provisional**: si hay variables sin valorar o propuestas sin confirmar, el resultado se rotula «provisional» en pantalla y en todas las salidas, con el recuento. Antes, con 0 datos se mostraba «Prioridad 3 — Baja, cada 12 meses» indistinguible de un resultado real. Una variable sin valorar nunca se interpreta como «No».
+- **Modificación del clínico**: solo se aplica con nivel válido y justificación de al menos 12 caracteres (antes se aplicaba con el motivo vacío). Figura en el resumen, el texto para historia clínica, el CSV, el JSON y la impresión, junto con la clasificación automática que se conserva. Si rebaja una prioridad automática del modelo (p. ej. embarazo → P1) se advierte; la regla no se ha endurecido (decisión pendiente del autor).
+
+### Importación y datos
+- **Importación validada**: solo variables del modelo con valores admitidos; el resto se descarta y se informa. Antes, `{"viralLoad":"banana"}` lanzaba `TypeError`, se guardaba el estado inválido y la aplicación quedaba en blanco tras recargar. Un estado corrupto ya guardado también se sanea al abrir.
+- El CSV importado admite comillas (antes `"P, 01"` quedaba en `"P`).
+- **Privacidad**: el JSON exportado ya no incluye el texto clínico pegado y el borrador del navegador (`localStorage`, sin cifrar) ya no conserva el texto pegado, el contenido importado, los fragmentos de evidencia ni el resultado calculado. Los casos guardados explícitamente («Guardar caso») no cambian.
+- JSON con esquema (`cmo-vih-export/1`) y estado; CSV con columnas nuevas al final (`status`, `automaticLevel`, `overrideLevel`, `overrideReason`, `pendingVariables`, `unconfirmedProposals`) y protegido frente a fórmulas.
+
+### Defectos corregidos
+- XSS por la evidencia extraída del texto pegado y por la etiqueta del paciente en la ventana de impresión.
+- El primer clic en «Analizar texto clínico» se perdía (el cambio del campo de texto volvía a dibujar la página y sustituía el botón).
+- Avisos no bloqueantes y anunciados (`toast`) en lugar de `alert()`; aviso al salir con cambios sin guardar; selector de tipo de importación sin nombre accesible.
+- Textos en español, inglés y portugués para todo lo nuevo (`gate.*`, `exports.*`). **Portugués: pendiente de revisión** (ver `PT_REVIEW.md`).
+
+### Pruebas
+- `npm test`: 61 en el primer bloque (50 previas + 11: huellas, paridad con el motor en 300 casos, propuestas sin confirmar, modificación, importación, estado corrupto, exportaciones, borrador). `npm run test:e2e`: 4 recorridos en Chromium con axe WCAG A/AA opcional (`AXE_PATH`).
+
+### Flujo común (etapas 5–6 e informe)
+- Nueva etapa **Seguimiento** tras la estratificación: variables que puntúan por sección del modelo, variables pendientes de valorar (con las propuestas sin confirmar señaladas), **estado de cada intervención del modelo** (realizada, planificada, no procede) y plan (próxima valoración y observaciones). El modelo no define otras «necesidades»: no se ha inventado ninguna.
+- **Informe único** (`cmo-report/1`, núcleo 0.3.0) en el idioma de la interfaz (es/en/pt): el texto para historia clínica, la vista previa, la impresión y el nuevo **PDF** salen de la misma estructura. Las funciones anteriores (`buildClinicalSummary`, `buildClinicalRecordText`, `buildPrintableHtml`) siguen exportadas pero la aplicación ya no las usa. Botón nuevo «Descargar texto (.txt)».
+- Casos guardados: incluyen el estado de las intervenciones y el plan; los casos anteriores se abren con valores vacíos.
+- Pruebas: 68 unitarias (7 nuevas del informe y del plan) y e2e ampliado (etapa de seguimiento, PDF, informe en inglés).
+
+### Pendiente
+- Revisión del portugués del núcleo (`LABELS.pt` en el hub) y de los textos nuevos (`PT_REVIEW.md`).
+- Heredados: `APP_VERSION` «v3 — September 2026»; claves de almacenamiento «v2»; idioma por defecto `en`.
+
 ## 3.1.0 — 2026-10-30
 
 Release (author's decision: minor version bump for the interface change). `package.json` and `cmo-app-meta` 3.0.0 → 3.1.0; `cmo-app-meta`: `status: "released"`, `releaseDate: "2026-10-30"`. Includes both sections below, previously unreleased. CMO scoring logic unchanged. The «CMO-VIH Pro v3 — September 2026» texts in `data/i18n` are unchanged (major version 3).

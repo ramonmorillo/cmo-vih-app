@@ -1,10 +1,14 @@
 {
   "name": "cmo-design-system",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "files": {
     "cmo-tokens.css": "b9a4322792efa3a2a6ad473c7f5120dfcb1602e65054cc188413b9de2d43d629",
     "cmo-components.css": "fab917ed91e1cca21666362ac702acf9132d3e14a62223e7c9b112882defa61c",
+    "cmo-flow.css": "46a57470efc88abe1930c13e7980972bcc01691c9c0f0e0caf2912382751b781",
     "cmo-author-signature.js": "89a9913cc9d9c067711d17a3ba7d477df3b3e2711c32516a0d97e9ecf9935d3a",
+    "cmo-report.js": "0964d22916bd829bf2e16f5724dffe721a45dc23d7a5486bfa2cc2439854cc4e",
+    "cmo-pdf.js": "fdead652b347bbb4392e2c215cbe3fcf8d9e123374bc4af8a3cf1aa39942808d",
+    "cmo-flow.js": "04aeabe142eaf2d70c33c07503e81ea49ea2e9462c724c6f7662fecece4d198a",
     "cmo-mark.svg": "e72f40cf434fee0101c8da40825fd49908d7183afd19b241b2974e2946b3ac1c",
     "favicon.svg": "8f9fadf72c9bc22b6bafa1fb0d5a2c3bc82864c061de01f773012313790ed22f"
   }

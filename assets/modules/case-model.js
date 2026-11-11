@@ -1,3 +1,5 @@
+import { isValidFieldValue } from './review-gate.js';
+import { normalizePlan } from './report-adapter.js';
 import { APP_VERSION, FIELD_DEFINITIONS } from './config.js';
 
 export function createEmptyField() {
@@ -48,6 +50,8 @@ export function buildNewPatientCase(overrides = {}) {
     source: 'manual',
     fields: Object.fromEntries(FIELD_DEFINITIONS.map((field) => [field.id, createEmptyField()])),
     notes: '',
+    interventionStatus: {},
+    plan: { nextReview: '', notes: '' },
     override: {
       enabled: false,
       level: 'auto',
@@ -103,6 +107,10 @@ export function normalizeFields(fields = {}) {
       ...createEmptyField(),
       ...(fields[field.id] || {})
     };
+    // Un valor que el modelo no admite (estado corrupto o importado) se descarta: antes dejaba la aplicación en blanco.
+    if (normalized[field.id].value && !isValidFieldValue(field.id, normalized[field.id].value)) {
+      normalized[field.id] = { ...createEmptyField(), status: 'missing' };
+    }
   });
   return normalized;
 }
@@ -117,6 +125,7 @@ export function normalizePatientCase(patientCase = {}, locale = 'en') {
     language: patientCase.language || locale,
     pseudonymizedPatientLabel: patientCase.pseudonymizedPatientLabel || '',
     fields: normalizeFields(patientCase.fields),
+    ...normalizePlan(patientCase),
     override: {
       ...base.override,
       ...(patientCase.override || {})
@@ -170,6 +179,8 @@ export function buildSavedCaseRecord(state) {
     narrative: patientCase.narrative || '',
     importRaw: patientCase.importRaw || '',
     notes: patientCase.notes || '',
+    interventionStatus: normalizePlan(patientCase).interventionStatus,
+    plan: normalizePlan(patientCase).plan,
     analysis: analysis ? JSON.parse(JSON.stringify(analysis)) : null,
     traceability: {
       ...patientCase.traceability,
@@ -193,6 +204,8 @@ export function hydrateStateFromSavedCase(state, record) {
     narrative: record.narrative,
     importRaw: record.importRaw,
     notes: record.notes,
+    interventionStatus: record.interventionStatus,
+    plan: record.plan,
     override: record.override,
     traceability: record.traceability,
     clinician: record.clinician
